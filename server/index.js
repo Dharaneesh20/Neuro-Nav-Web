@@ -13,6 +13,7 @@ const communityReportRoutes = require('./routes/communityReport');
 const musicTherapyRoutes = require('./routes/musicTherapy');
 const historyRoutes = require('./routes/history');
 const exportRoutes = require('./routes/export');
+const healthRoutes = require('./routes/health');
 const { securityMiddleware, apiLimiter } = require('./middleware/security');
 
 const app = express();
@@ -32,12 +33,8 @@ app.use(apiLimiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'NeuroNav API is running' });
-});
-
 // Routes
+app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/calm-scores', calmScoreRoutes);
