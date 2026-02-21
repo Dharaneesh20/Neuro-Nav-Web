@@ -45,6 +45,7 @@ const App = () => {
     <Router>
       <div className="app">
         {isAuthenticated && <Navigation />}
+        {!isAuthenticated && <Navigation />}
         
         <main className="main-content">
           <Routes>

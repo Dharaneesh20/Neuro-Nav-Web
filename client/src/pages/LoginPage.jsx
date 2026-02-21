@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiMail, FiLock, FiEye, FiEyeOff, FiArrowRight } from 'react-icons/fi';
+import { FaGoogle, FaApple } from 'react-icons/fa';
 import Card from '../components/Card';
 import { Link, useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
@@ -188,9 +189,11 @@ const LoginPage = () => {
               {/* Social Login */}
               <motion.div className="social-login" variants={itemVariants}>
                 <button type="button" className="social-btn google">
+                  <FaGoogle size={20} />
                   <span>Google</span>
                 </button>
                 <button type="button" className="social-btn apple">
+                  <FaApple size={20} />
                   <span>Apple</span>
                 </button>
               </motion.div>
