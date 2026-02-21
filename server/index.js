@@ -13,14 +13,22 @@ const communityReportRoutes = require('./routes/communityReport');
 const musicTherapyRoutes = require('./routes/musicTherapy');
 const historyRoutes = require('./routes/history');
 const exportRoutes = require('./routes/export');
+const { securityMiddleware, apiLimiter } = require('./middleware/security');
 
 const app = express();
 
 // Connect to database
 connectDB();
 
+// Security Middleware
+app.use(securityMiddleware);
+
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || '*',
+  credentials: true,
+}));
+app.use(apiLimiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
