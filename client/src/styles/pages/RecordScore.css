@@ -1,0 +1,351 @@
+/* Record Score Page Styles */
+
+.record-page {
+  min-height: 100vh;
+  padding: 2rem 0;
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+}
+
+.record-page.success-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-container {
+  max-width: 500px;
+  width: 100%;
+  padding: 2rem;
+  text-align: center;
+}
+
+.success-icon {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 2rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--success) 0%, #34d399 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-lg);
+}
+
+.success-container h2 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.success-container p {
+  font-size: 1.125rem;
+  margin-bottom: 2rem;
+  color: var(--text-secondary);
+}
+
+.record-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.record-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.record-header p {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+}
+
+.record-content {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 2rem;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.form-card {
+  min-height: auto;
+}
+
+.form-section {
+  margin-bottom: 2rem;
+}
+
+.form-section:last-child {
+  margin-bottom: 0;
+}
+
+.form-section h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.section-desc {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+.sliders-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.slider-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.slider-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.slider-header label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.icon {
+  font-size: 1.5rem;
+}
+
+.slider-value {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--primary);
+  min-width: 35px;
+  text-align: right;
+}
+
+.slider {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(
+    to right,
+    #ef4444 0%,
+    #f59e0b 33%,
+    #10b981 66%,
+    #10b981 100%
+  );
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  border: 3px solid white;
+  transition: all var(--transition-base);
+}
+
+.slider::-webkit-slider-thumb:active {
+  transform: scale(1.2);
+  box-shadow: var(--shadow-lg);
+}
+
+.slider::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  border: 3px solid white;
+  transition: all var(--transition-base);
+}
+
+.textarea {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: inherit;
+  resize: vertical;
+  transition: all var(--transition-base);
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.textarea::placeholder {
+  color: var(--text-light);
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.form-actions .btn {
+  flex: 1;
+}
+
+.info-card {
+  min-height: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.info-content h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.125rem;
+}
+
+.tips-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tips-list li {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.tips-list li:before {
+  content: '✓';
+  color: var(--primary);
+  font-weight: 700;
+  min-width: 20px;
+}
+
+.result-card {
+  margin-top: 2rem;
+}
+
+.result-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.calm-score-large {
+  text-align: center;
+  padding: 1.5rem;
+}
+
+.calm-score-large .score {
+  display: block;
+  font-size: 3rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.calm-score-large .label {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-top: 0.5rem;
+}
+
+.stressors,
+.recommendations {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.stressors h4,
+.recommendations h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+}
+
+.stressors ul,
+.recommendations ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stressors li,
+.recommendations li {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.stressors li:before {
+  content: '⚠';
+  position: absolute;
+  left: 0;
+}
+
+.recommendations li:before {
+  content: '💡';
+  position: absolute;
+  left: 0;
+}
+
+@media (max-width: 1024px) {
+  .record-content {
+    grid-template-columns: 1fr;
+  }
+
+  .info-card {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .record-page {
+    padding: 1rem 0;
+  }
+
+  .record-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .record-content {
+    padding: 0 1rem;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .success-container {
+    padding: 1rem;
+  }
+}
