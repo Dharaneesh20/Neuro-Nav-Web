@@ -1,0 +1,23 @@
+/* Modern Card Styles */
+
+.modern-card {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-md);
+}
+
+.modern-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.modern-card.gradient {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+  border-color: rgba(99, 102, 241, 0.1);
+}
+
+.modern-card.gradient:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+}
