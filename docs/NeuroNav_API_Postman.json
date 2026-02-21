@@ -1,0 +1,497 @@
+{
+  "info": {
+    "_postman_id": "neuronav-api-collection",
+    "name": "NeuroNav API Collection",
+    "description": "Complete API endpoints for NeuroNav autism support companion",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Sign Up",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"securePassword123!\",\n  \"phone\": \"+1234567890\",\n  \"autismLevel\": \"moderate\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/signup",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "signup"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"securePassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Verify Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/verify",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "verify"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Profile",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/user/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sensoryPreferences\": {\n    \"noiseAvoidance\": 75,\n    \"lightAvoidance\": 60,\n    \"crowdAvoidance\": 80,\n    \"temperatureAvoidance\": 45,\n    \"odorAvoidance\": 50\n  },\n  \"triggers\": [\"loud_noise\", \"bright_lights\", \"crowds\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/user/profile",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Add Caregiver",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mom\",\n  \"phone\": \"+1234567891\",\n  \"email\": \"mom@example.com\",\n  \"relationship\": \"Mother\",\n  \"notificationPreference\": [\"email\", \"sms\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/user/caregivers",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "caregivers"]
+            }
+          }
+        },
+        {
+          "name": "Get Caregivers",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/user/caregivers",
+              "host": ["{{base_url}}"],
+              "path": ["api", "user", "caregivers"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Calm Score",
+      "item": [
+        {
+          "name": "Record Calm Score",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"noiseLevel\": 65,\n  \"lightIntensity\": 75,\n  \"crowdingLevel\": 55,\n  \"temperature\": 22,\n  \"odorLevel\": 35,\n  \"location\": {\n    \"type\": \"Point\",\n    \"coordinates\": [-74.0060, 40.7128]\n  },\n  \"triggers\": [\"moderate_noise\", \"crowded\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/calmScore",
+              "host": ["{{base_url}}"],
+              "path": ["api", "calmScore"]
+            }
+          }
+        },
+        {
+          "name": "Get Calm Score History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/calmScore?limit=10&skip=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "calmScore"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Calm Score Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/calmScore/stats?startDate=2026-01-01&endDate=2026-01-31",
+              "host": ["{{base_url}}"],
+              "path": ["api", "calmScore", "stats"],
+              "query": [
+                {
+                  "key": "startDate",
+                  "value": "2026-01-01"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2026-01-31"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Panic Events",
+      "item": [
+        {
+          "name": "Trigger Panic Button",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"severity\": \"panic\",\n  \"location\": {\n    \"address\": \"123 Main St, New York, NY\",\n    \"coordinates\": [-74.0060, 40.7128]\n  },\n  \"triggers\": [\"loud_noise\", \"crowds\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/panicEvent/trigger",
+              "host": ["{{base_url}}"],
+              "path": ["api", "panicEvent", "trigger"]
+            }
+          }
+        },
+        {
+          "name": "Get Panic Events",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/panicEvent?limit=10&skip=0",
+              "host": ["{{base_url}}"],
+              "path": ["api", "panicEvent"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "skip",
+                  "value": "0"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Panic Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/panicEvent/stats/summary",
+              "host": ["{{base_url}}"],
+              "path": ["api", "panicEvent", "stats", "summary"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Safe Havens",
+      "item": [
+        {
+          "name": "Add Safe Haven",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Central Library - Quiet Zone\",\n  \"type\": \"library\",\n  \"location\": {\n    \"address\": \"456 Fifth Ave, New York, NY\",\n    \"coordinates\": [-73.9726, 40.7539]\n  },\n  \"sensoryFeatures\": {\n    \"quietZone\": true,\n    \"lowLighting\": true,\n    \"isolatedArea\": false,\n    \"calmEnvironment\": true,\n    \"petFriendly\": false,\n    \"accessibleToilets\": true,\n    \"disabledAccess\": true\n  },\n  \"amenities\": [\"WiFi\", \"Restrooms\", \"Water fountain\", \"Comfortable seating\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/safeHaven",
+              "host": ["{{base_url}}"],
+              "path": ["api", "safeHaven"]
+            }
+          }
+        },
+        {
+          "name": "Find Nearby Safe Havens",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/safeHaven/nearby?lat=40.7128&lon=-74.0060&distance=5",
+              "host": ["{{base_url}}"],
+              "path": ["api", "safeHaven", "nearby"],
+              "query": [
+                {
+                  "key": "lat",
+                  "value": "40.7128"
+                },
+                {
+                  "key": "lon",
+                  "value": "-74.0060"
+                },
+                {
+                  "key": "distance",
+                  "value": "5"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Safe Havens",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/safeHaven?type=library&city=New York",
+              "host": ["{{base_url}}"],
+              "path": ["api", "safeHaven"],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "library"
+                },
+                {
+                  "key": "city",
+                  "value": "New York"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Community Reports",
+      "item": [
+        {
+          "name": "Create Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"sound-area\",\n  \"severity\": \"moderate\",\n  \"location\": {\n    \"address\": \"200 Park Ave, New York, NY\",\n    \"coordinates\": [-73.9800, 40.7500]\n  },\n  \"description\": \"Busy intersection with lots of noise\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/communityReport",
+              "host": ["{{base_url}}"],
+              "path": ["api", "communityReport"]
+            }
+          }
+        },
+        {
+          "name": "Upvote Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"voteType\": \"upvote\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/communityReport/{{reportId}}/vote",
+              "host": ["{{base_url}}"],
+              "path": ["api", "communityReport", "{{reportId}}", "vote"]
+            }
+          }
+        },
+        {
+          "name": "Get Trending Reports",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/communityReport/trending?limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["api", "communityReport", "trending"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}
