@@ -1,0 +1,54 @@
+{
+  "name": "neuronav",
+  "displayName": "NeuroNav",
+  "description": "Autism support companion application - complete MERN stack implementation",
+  "version": "1.0.0",
+  "license": "MIT",
+  "author": {
+    "name": "Team Dzio",
+    "email": "neuronav@example.com"
+  },
+  "contributors": [
+    {
+      "name": "R S Dharaneesh",
+      "url": "https://github.com/Dharaneesh20"
+    },
+    {
+      "name": "Dev Prasath A",
+      "url": "https://github.com"
+    },
+    {
+      "name": "Abinayaa A",
+      "url": "https://github.com"
+    },
+    {
+      "name": "Dharshini R S",
+      "url": "https://github.com"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/neuronav.git"
+  },
+  "keywords": [
+    "autism",
+    "sensory",
+    "support",
+    "anxiety",
+    "navigation",
+    "neurodiversity",
+    "health-tech",
+    "ai",
+    "mern",
+    "react",
+    "nodejs"
+  ],
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/neuronav/issues"
+  },
+  "homepage": "https://github.com/yourusername/neuronav#readme"
+}
