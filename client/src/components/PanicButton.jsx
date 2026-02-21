@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiAlert, FiMapPin, FiPhone, FiX } from 'react-icons/fi';
+import { FiAlertTriangle, FiMapPin, FiPhone, FiX } from 'react-icons/fi';
 import { panicEventAPI } from '../services/api';
 import '../styles/components/PanicButton.css';
 
@@ -112,7 +112,7 @@ const PanicButton = ({ className }) => {
             exit={{ scale: 0 }}
             transition={{ type: 'spring', stiffness: 300 }}
           >
-            <FiAlert className="panic-icon" />
+            <FiAlertTriangle className="panic-icon" />
             <span className="panic-text">
               {showConfirmation ? 'Confirm Alert' : 'SOS Help'}
             </span>
@@ -132,7 +132,7 @@ const PanicButton = ({ className }) => {
             transition={{ type: 'spring', stiffness: 300 }}
           >
             <div className="alert-icon-large">
-              <FiAlert />
+              <FiAlertTriangle />
             </div>
             <h3>Alert Activated</h3>
             <p>Caregivers have been notified of your location</p>
@@ -168,7 +168,7 @@ const PanicButton = ({ className }) => {
               </button>
 
               <div className="modal-header">
-                <FiAlert className="modal-icon" />
+                <FiAlertTriangle className="modal-icon" />
                 <h2>Emergency Alert</h2>
               </div>
 
