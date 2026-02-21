@@ -1,17 +1,25 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { FiHome, FiBarChart2, FiMap, FiSettings, FiLogOut, FiMenu, FiX } from 'react-icons/fi';
+import { Link, useNavigate } from 'react-router-dom';
 import './Navigation.css';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const navigate = useNavigate();
 
   const navItems = [
-    { icon: FiHome, label: 'Home', href: '/' },
-    { icon: FiBarChart2, label: 'Dashboard', href: '/dashboard' },
+    { icon: FiHome, label: 'Home', href: '/dashboard' },
+    { icon: FiBarChart2, label: 'Analytics', href: '/analytics' },
     { icon: FiMap, label: 'Map', href: '/map' },
     { icon: FiSettings, label: 'Settings', href: '/settings' },
   ];
+
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    navigate('/login');
+  };
 
   const containerVariants = {
     hidden: { opacity: 0, y: -20 },
@@ -66,17 +74,21 @@ const Navigation = () => {
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
-              <motion.a
-                key={item.label}
-                href={item.href}
-                className="nav-link"
-                variants={itemVariants}
-                whileHover={{ scale: 1.05, color: '#6366f1' }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Icon size={20} />
-                <span>{item.label}</span>
-              </motion.a>
+              <motion.div key={item.label} variants={itemVariants}>
+                <Link
+                  to={item.href}
+                  className="nav-link"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <motion.div
+                    whileHover={{ scale: 1.05, color: '#6366f1' }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Icon size={20} />
+                    <span>{item.label}</span>
+                  </motion.div>
+                </Link>
+              </motion.div>
             );
           })}
 
@@ -85,6 +97,7 @@ const Navigation = () => {
             variants={itemVariants}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={handleLogout}
           >
             <FiLogOut size={18} />
             <span>Logout</span>

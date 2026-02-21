@@ -7,13 +7,16 @@ const connectDB = async () => {
     await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000,
     });
     
-    console.log('MongoDB connected successfully');
+    console.log('✅ MongoDB connected successfully');
     return true;
   } catch (error) {
-    console.error('MongoDB connection error:', error.message);
-    process.exit(1);
+    console.warn('⚠️  MongoDB connection error:', error.message);
+    console.warn('⚠️  Running in offline mode - database features unavailable');
+    // Don't exit - allow app to run for testing health checks
+    return false;
   }
 };
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FiCheck, FiAlertCircle } from 'react-icons/fi';
 import Card from '../components/Card';
+import { calmScoreAPI } from '../services/api';
 import '../styles/pages/RecordScore.css';
 
 const RecordScore = () => {
@@ -16,6 +17,8 @@ const RecordScore = () => {
 
   const [submitted, setSubmitted] = useState(false);
   const [recommendations, setRecommendations] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSliderChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -25,35 +28,45 @@ const RecordScore = () => {
     setFormData(prev => ({ ...prev, description: e.target.value }));
   };
 
-  const handleSubmit = () => {
-    // Simulate AI recommendation
-    const avgScore = Math.round(
-      (formData.noiseLevel + formData.lightIntensity + formData.crowdingLevel + formData.odorLevel) / 4
-    );
+  const handleSubmit = async () => {
+    setIsLoading(true);
+    setError('');
 
-    setRecommendations({
-      calmScore: avgScore,
-      stressors: ['Noise level', 'Crowding'].filter((_, i) => i < 2),
-      recommendations: [
-        'Try noise-cancelling headphones',
-        'Take breaks in quiet spaces',
-        'Practice deep breathing exercises',
-      ],
-    });
-
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({
-        noiseLevel: 5,
-        lightIntensity: 5,
-        crowdingLevel: 5,
-        temperature: 20,
-        odorLevel: 5,
-        description: '',
+    try {
+      const response = await calmScoreAPI.record({
+        noiseLevel: formData.noiseLevel,
+        lightIntensity: formData.lightIntensity,
+        crowdingLevel: formData.crowdingLevel,
+        temperature: formData.temperature,
+        odorLevel: formData.odorLevel,
+        environmentDescription: formData.description,
+        coordinates: [0, 0], // Can be updated with geolocation
       });
-      setRecommendations(null);
-    }, 3000);
+
+      setRecommendations({
+        calmScore: response.data.analysis.calmScore,
+        stressors: response.data.analysis.stressors,
+        recommendations: response.data.analysis.recommendations,
+      });
+
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        setFormData({
+          noiseLevel: 5,
+          lightIntensity: 5,
+          crowdingLevel: 5,
+          temperature: 20,
+          odorLevel: 5,
+          description: '',
+        });
+        setRecommendations(null);
+      }, 5000);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to record calm score');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const sliders = [
@@ -186,15 +199,27 @@ const RecordScore = () => {
               />
             </div>
 
+            {error && (
+              <motion.div
+                className="error-message"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <FiAlertCircle />
+                {error}
+              </motion.div>
+            )}
+
             <div className="form-actions">
               <motion.button
                 className="btn btn-primary btn-lg"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: isLoading ? 1 : 1.05 }}
+                whileTap={{ scale: isLoading ? 1 : 0.95 }}
                 onClick={handleSubmit}
+                disabled={isLoading}
               >
                 <FiCheck size={20} />
-                Analyze & Save
+                {isLoading ? 'Analyzing...' : 'Analyze & Save'}
               </motion.button>
               <motion.button
                 className="btn btn-secondary btn-lg"

@@ -1,10 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiToggleLeft, FiToggleRight, FiBell, FiLock, FiUser, FiChevronRight } from 'react-icons/fi';
+import { FiToggleLeft, FiToggleRight, FiBell, FiLock, FiUser, FiChevronRight, FiSave, FiAlertCircle } from 'react-icons/fi';
 import Card from '../components/Card';
+import { userAPI } from '../services/api';
 import '../styles/pages/Settings.css';
 
 const Settings = () => {
+  const [profile, setProfile] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    autismLevel: 'moderate',
+  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+
   const [settings, setSettings] = useState({
     notifications: true,
     emailAlerts: false,
@@ -12,6 +25,46 @@ const Settings = () => {
     darkMode: false,
     dataSharing: true,
   });
+
+  useEffect(() => {
+    fetchProfile();
+  }, []);
+
+  const fetchProfile = async () => {
+    try {
+      const response = await userAPI.getProfile();
+      setProfile({
+        name: response.data.name,
+        email: response.data.email,
+        phone: response.data.phone || '',
+        autismLevel: response.data.autismLevel || 'moderate',
+      });
+    } catch (err) {
+      console.error('Failed to load profile:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleProfileChange = (field, value) => {
+    setProfile(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveProfile = async () => {
+    setIsSaving(true);
+    setError('');
+    setSuccess('');
+    try {
+      await userAPI.updateProfile(profile);
+      setSuccess('Profile updated successfully!');
+      setIsEditing(false);
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to update profile');
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   const toggleSetting = (key) => {
     setSettings(prev => ({ ...prev, [key]: !prev[key] }));

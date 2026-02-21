@@ -30,11 +30,15 @@ const LoginPage = () => {
     setError('');
     setIsLoading(true);
     try {
-      const response = await authAPI.login(formData.email, formData.password);
-      localStorage.setItem('token', response.token);
+      const response = await authAPI.login({
+        email: formData.email,
+        password: formData.password,
+      });
+      localStorage.setItem('authToken', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message || 'Login failed');
+      setError(err.response?.data?.error || 'Login failed');
     } finally {
       setIsLoading(false);
     }

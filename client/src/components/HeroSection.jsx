@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { FiBrain, FiMapPin, FiTrendingUp, FiZap } from 'react-icons/fi';
+import { FiActivity, FiMapPin, FiTrendingUp, FiZap } from 'react-icons/fi';
 import './HeroSection.css';
 
 const HeroSection = () => {
@@ -34,7 +34,7 @@ const HeroSection = () => {
 
   const features = [
     {
-      icon: FiBrain,
+      icon: FiActivity,
       title: 'AI-Powered',
       desc: 'Smart sensory analysis',
     },

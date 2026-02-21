@@ -1,21 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { FiTrendingUp, FiMapPin, FiAlertCircle, FiChevronRight } from 'react-icons/fi';
+import { FiTrendingUp, FiMapPin, FiAlertCircle, FiChevronRight, FiLoader } from 'react-icons/fi';
 import Card from '../components/Card';
+import { calmScoreAPI, panicEventAPI, userAPI } from '../services/api';
 import '../styles/pages/Dashboard.css';
 
 const Dashboard = () => {
-  const [calmScores] = useState([
-    { date: 'Today', score: 72, location: 'Coffee Shop' },
-    { date: 'Yesterday', score: 65, location: 'Park' },
-    { date: '2 days ago', score: 81, location: 'Home' },
+  const [isLoading, setIsLoading] = useState(true);
+  const [stats, setStats] = useState([
+    { label: 'Average Calm Score', value: '—', change: '' },
+    { label: 'Safe Spaces', value: '—', change: '' },
+    { label: 'This Week', value: '—', change: 'recordings' },
   ]);
+  const [calmScores, setCalmScores] = useState([]);
+  const [user, setUser] = useState(null);
 
-  const [stats] = useState([
-    { label: 'Average Calm Score', value: '73', change: '+5%' },
-    { label: 'Safe Spaces', value: '12', change: '+2' },
-    { label: 'This Week', value: '24', change: 'recordings' },
-  ]);
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Fetch user profile
+      const userRes = await userAPI.getProfile();
+      setUser(userRes.data);
+
+      // Fetch recent calm scores
+      const scoresRes = await calmScoreAPI.getHistory(5, 0);
+      const scores = scoresRes.data.map(score => ({
+        date: new Date(score.timestamp).toLocaleDateString(),
+        score: score.calmScore,
+        location: score.environmentDescription || 'Unknown location'
+      }));
+      setCalmScores(scores);
+
+      // Fetch calm score stats for this week
+      const statsRes = await calmScoreAPI.getStats(7);
+      setStats([
+        { label: 'Average Calm Score', value: statsRes.data.average.toString(), change: '+5%' },
+        { label: 'Safe Spaces', value: '12', change: '+2' },
+        { label: 'This Week', value: statsRes.data.count.toString(), change: 'recordings' },
+      ]);
+    } catch (error) {
+      console.error('Failed to fetch dashboard data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
