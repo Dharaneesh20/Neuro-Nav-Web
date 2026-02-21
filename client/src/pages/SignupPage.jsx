@@ -1,23 +1,33 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { FiMail, FiLock, FiUser, FiEye, FiEyeOff, FiArrowRight, FiCheck } from 'react-icons/fi';
+import Card from '../components/Card';
 import { Link, useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
-import '../styles/auth.css';
+import '../styles/pages/Auth.css';
 
 const SignupPage = () => {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
     confirmPassword: '',
-    phone: '',
     autismLevel: 'moderate',
+    agreeTerms: false,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
     setFormData((prev) => ({
       ...prev,
       [name]: value,
