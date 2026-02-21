@@ -1,0 +1,34 @@
+{
+  "name": "neuronav",
+  "version": "1.0.0",
+  "description": "NeuroNav - Comprehensive autism support companion application",
+  "main": "server/index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "server:dev": "cd server && nodemon index.js",
+    "client:dev": "cd client && npm start",
+    "server:start": "cd server && node index.js",
+    "build": "cd client && npm run build",
+    "test": "concurrently \"npm run server:test\" \"npm run client:test\"",
+    "server:test": "cd server && jest --coverage",
+    "client:test": "cd client && npm test"
+  },
+  "keywords": [
+    "autism",
+    "sensory",
+    "support",
+    "anxiety",
+    "navigation"
+  ],
+  "authors": [
+    "R S Dharaneesh",
+    "Dev Prasath A",
+    "Abinayaa A",
+    "Dharshini R S"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^7.6.0",
+    "nodemon": "^3.0.2"
+  }
+}
