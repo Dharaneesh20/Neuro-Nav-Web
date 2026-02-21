@@ -1,0 +1,386 @@
+### NeuroNav API Testing Examples
+### Test file for VS Code REST Client extension
+
+@baseUrl = http://localhost:5000/api
+@token = 
+
+###
+### ============================================================
+### AUTHENTICATION ENDPOINTS
+### ============================================================
+
+### Sign Up
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "SecurePassword123!",
+  "phone": "+1234567890",
+  "autismLevel": "moderate"
+}
+
+### 
+### Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "SecurePassword123!"
+}
+
+###
+### Verify Token
+GET {{baseUrl}}/auth/verify
+Authorization: Bearer {{token}}
+
+###
+### ============================================================
+### USER PROFILE ENDPOINTS
+### ============================================================
+
+### Get Profile
+GET {{baseUrl}}/users/profile
+Authorization: Bearer {{token}}
+
+###
+### Update Profile
+PUT {{baseUrl}}/users/profile
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "sensoryPreferences": {
+    "noiseAvoidance": 75,
+    "lightAvoidance": 60,
+    "crowdAvoidance": 80,
+    "temperatureAvoidance": 45,
+    "odorAvoidance": 50
+  },
+  "triggers": ["loud_noise", "bright_lights", "crowds"]
+}
+
+###
+### Add Caregiver
+POST {{baseUrl}}/users/caregivers
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Mom",
+  "phone": "+1234567891",
+  "email": "mom@example.com",
+  "relationship": "Mother",
+  "notificationPreference": ["email", "sms"]
+}
+
+###
+### Get Caregivers
+GET {{baseUrl}}/users/caregivers
+Authorization: Bearer {{token}}
+
+###
+### Delete Caregiver
+DELETE {{baseUrl}}/users/caregivers/{{caregiverId}}
+Authorization: Bearer {{token}}
+
+###
+### ============================================================
+### CALM SCORE ENDPOINTS
+### ============================================================
+
+### Record Calm Score
+POST {{baseUrl}}/calm-scores
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "noiseLevel": 65,
+  "lightIntensity": 75,
+  "crowdingLevel": 55,
+  "temperature": 22,
+  "odorLevel": 35,
+  "location": {
+    "type": "Point",
+    "coordinates": [-74.0060, 40.7128]
+  },
+  "triggers": ["moderate_noise", "crowded"]
+}
+
+###
+### Get Calm Score History
+GET {{baseUrl}}/calm-scores?limit=10&skip=0
+Authorization: Bearer {{token}}
+
+###
+### Get Calm Score Statistics
+GET {{baseUrl}}/calm-scores/stats?startDate=2026-01-01&endDate=2026-01-31
+Authorization: Bearer {{token}}
+
+###
+### ============================================================
+### PANIC EVENT ENDPOINTS
+### ============================================================
+
+### Trigger Panic Button
+POST {{baseUrl}}/panic-events/trigger
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "severity": "panic",
+  "location": {
+    "address": "123 Main St, New York, NY",
+    "coordinates": [-74.0060, 40.7128]
+  },
+  "triggers": ["loud_noise", "crowds"]
+}
+
+###
+### Get Panic Events
+GET {{baseUrl}}/panic-events?limit=10&skip=0
+Authorization: Bearer {{token}}
+
+###
+### Get Panic Statistics
+GET {{baseUrl}}/panic-events/stats/summary
+Authorization: Bearer {{token}}
+
+###
+### Update Panic Event
+PUT {{baseUrl}}/panic-events/{{eventId}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "resolutionNotes": "Calmed down after 10 minutes in quiet space"
+}
+
+###
+### ============================================================
+### SAFE HAVEN ENDPOINTS
+### ============================================================
+
+### Add Safe Haven
+POST {{baseUrl}}/safe-havens
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Central Library - Quiet Zone",
+  "type": "library",
+  "location": {
+    "address": "456 Fifth Ave, New York, NY",
+    "coordinates": [-73.9726, 40.7539]
+  },
+  "sensoryFeatures": {
+    "quietZone": true,
+    "lowLighting": true,
+    "isolatedArea": false,
+    "calmEnvironment": true,
+    "petFriendly": false,
+    "accessibleToilets": true,
+    "disabledAccess": true
+  },
+  "amenities": ["WiFi", "Restrooms", "Water fountain", "Comfortable seating"]
+}
+
+###
+### Find Nearby Safe Havens
+GET {{baseUrl}}/safe-havens/nearby?lat=40.7128&lon=-74.0060&distance=5
+Authorization: Bearer {{token}}
+
+###
+### Get Safe Havens (with filters)
+GET {{baseUrl}}/safe-havens?type=library&city=New York
+Authorization: Bearer {{token}}
+
+###
+### Get Safe Haven Details
+GET {{baseUrl}}/safe-havens/{{havenId}}
+Authorization: Bearer {{token}}
+
+###
+### Add Review to Safe Haven
+POST {{baseUrl}}/safe-havens/{{havenId}}/review
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "rating": 5,
+  "comment": "Perfect quiet space for working and decompressing"
+}
+
+###
+### Record Haven Visit
+POST {{baseUrl}}/safe-havens/{{havenId}}/visit
+Authorization: Bearer {{token}}
+
+###
+### ============================================================
+### COMMUNITY REPORT ENDPOINTS
+### ============================================================
+
+### Create Community Report
+POST {{baseUrl}}/community-reports
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "type": "sound-area",
+  "severity": "moderate",
+  "location": {
+    "address": "200 Park Ave, New York, NY",
+    "coordinates": [-73.9800, 40.7500]
+  },
+  "description": "Busy intersection with lots of noise"
+}
+
+###
+### Get Community Reports
+GET {{baseUrl}}/community-reports?type=sound-area&status=verified
+Authorization: Bearer {{token}}
+
+###
+### Get Nearby Reports
+GET {{baseUrl}}/community-reports/nearby?lat=40.7128&lon=-74.0060&distance=2
+Authorization: Bearer {{token}}
+
+###
+### Get Trending Reports
+GET {{baseUrl}}/community-reports/trending?limit=10
+Authorization: Bearer {{token}}
+
+###
+### Vote on Report
+POST {{baseUrl}}/community-reports/{{reportId}}/vote
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "voteType": "upvote"
+}
+
+###
+### Add Comment to Report
+POST {{baseUrl}}/community-reports/{{reportId}}/comment
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "text": "I agree, very noisy here"
+}
+
+###
+### ============================================================
+### MUSIC THERAPY ENDPOINTS
+### ============================================================
+
+### Record Music Therapy Session
+POST {{baseUrl}}/music-therapy
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "trackId": "spotify_track_id",
+  "trackName": "Calm Ocean Waves",
+  "artist": "Relaxation Music",
+  "calmScoreBefore": 60,
+  "calmScoreAfter": 85,
+  "duration": 300,
+  "effectiveness": 4
+}
+
+###
+### Get Music Therapy History
+GET {{baseUrl}}/music-therapy?limit=10&skip=0
+Authorization: Bearer {{token}}
+
+###
+### Get Music Therapy Statistics
+GET {{baseUrl}}/music-therapy/stats/summary
+Authorization: Bearer {{token}}
+
+###
+### Get Recommendations for Mood
+GET {{baseUrl}}/music-therapy/recommendations/relaxed
+Authorization: Bearer {{token}}
+
+###
+### ============================================================
+### HISTORY & ANALYTICS ENDPOINTS
+### ============================================================
+
+### Get Activity History
+GET {{baseUrl}}/history?limit=20&skip=0
+Authorization: Bearer {{token}}
+
+###
+### Get History Statistics
+GET {{baseUrl}}/history/analytics/summary
+Authorization: Bearer {{token}}
+
+###
+### Get Timeline (grouped by date)
+GET {{baseUrl}}/history/timeline?startDate=2026-01-01&endDate=2026-01-31
+Authorization: Bearer {{token}}
+
+###
+### Delete Old History Entries
+DELETE {{baseUrl}}/history/cleanup/90
+Authorization: Bearer {{token}}
+
+###
+### ============================================================
+### EXPORT ENDPOINTS
+### ============================================================
+
+### Export to PDF
+GET {{baseUrl}}/export/pdf?startDate=2026-01-01&endDate=2026-01-31
+Authorization: Bearer {{token}}
+
+###
+### Export to Excel
+GET {{baseUrl}}/export/excel?startDate=2026-01-01&endDate=2026-01-31
+Authorization: Bearer {{token}}
+
+###
+### Get Export Statistics
+GET {{baseUrl}}/export/stats
+Authorization: Bearer {{token}}
+
+###
+### ============================================================
+### HEALTH CHECK ENDPOINTS
+### ============================================================
+
+### Basic Health Check
+GET {{baseUrl}}/health
+
+###
+### Detailed Health Check
+GET {{baseUrl}}/health/detailed
+
+###
+### Readiness Check (for Kubernetes)
+GET {{baseUrl}}/health/ready
+
+###
+### Liveness Check (for Kubernetes)
+GET {{baseUrl}}/health/alive
+
+###
+### Performance Metrics
+GET {{baseUrl}}/health/metrics
+
+###
+### Instructions for use:
+###
+### 1. Install VS Code REST Client extension
+### 2. Replace {{token}} with actual JWT token from login response
+### 3. Click "Send Request" to execute each request
+### 4. Use @baseUrl variable to change server URL (localhost, staging, production)
+### 5. Replace {{id}} variables with actual resource IDs
+###
