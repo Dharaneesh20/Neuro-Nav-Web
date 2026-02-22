@@ -7,7 +7,7 @@ import {
 import { geminiAPI } from '../services/gemini';
 import '../styles/pages/PlanTrip.css';
 
-const GMAP_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'REDACTED_MAPS_KEY';
+const GMAP_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
 /* ── Load Google Maps script once ─────────────────────────── */
 const loadGoogleMaps = (() => {

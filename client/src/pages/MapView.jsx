@@ -7,7 +7,7 @@ import {
 import { routeAPI } from '../services/api';
 import '../styles/pages/MapView.css';
 
-const GMAP_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'REDACTED_MAPS_KEY';
+const GMAP_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 
 /* ── singleton Maps loader (display only, no Places library needed) ── */
 const loadGoogleMaps = (() => {

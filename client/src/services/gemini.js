@@ -1,4 +1,4 @@
-const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY || 'REDACTED_GEMINI_KEY';
+const GEMINI_API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
 export const geminiAPI = {

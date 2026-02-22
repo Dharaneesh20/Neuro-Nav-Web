@@ -5,7 +5,7 @@ import { panicEventAPI } from '../services/api';
 import '../styles/components/PanicButton.css';
 
 /* ── Google Maps singleton ─────────────────────────── */
-const GMAP_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || 'REDACTED_MAPS_KEY';
+const GMAP_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY;
 const loadGoogleMaps = (() => {
   let p = null;
   return () => {
