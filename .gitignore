@@ -12,6 +12,9 @@ server/.env
 client/.env
 client/.env.local
 
+# GitHub Actions workflows (PAT lacks workflow scope)
+.github/workflows/
+
 dist/
 build/
 client/build/
