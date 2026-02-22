@@ -16,10 +16,14 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
       minlength: 6,
     },
+    firebaseUid: {
+      type: String,
+      sparse: true,
+    },
     phone: String,
+    location: { type: String, default: '' },
     dateOfBirth: Date,
     autismLevel: {
       type: String,
@@ -34,6 +38,14 @@ const userSchema = new mongoose.Schema(
       odorSensitivity: { type: Number, min: 0, max: 100, default: 50 },
     },
     triggers: [String],
+    settings: {
+      notifications: { type: Boolean, default: true },
+      emailAlerts:   { type: Boolean, default: false },
+      soundAlerts:   { type: Boolean, default: true },
+      dataSharing:   { type: Boolean, default: true },
+      darkMode:      { type: Boolean, default: false },
+      language:      { type: String, default: 'English' },
+    },
     caregiverContacts: [
       {
         name: String,
@@ -43,6 +55,19 @@ const userSchema = new mongoose.Schema(
       },
     ],
     profilePicture: String,
+    googleAvatar: String,
+    bannedUntil: {
+      type: Date,
+      default: null,
+    },
+    banHistory: [
+      {
+        reason: String,
+        bannedAt: { type: Date, default: Date.now },
+        bannedUntil: Date,
+        bannedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      },
+    ],
     isVerified: {
       type: Boolean,
       default: false,
@@ -61,7 +86,7 @@ const userSchema = new mongoose.Schema(
 
 // Hash password before saving
 userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
+  if (!this.password || !this.isModified('password')) {
     return next();
   }
 

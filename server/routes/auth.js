@@ -88,4 +88,47 @@ router.get('/verify', authMiddleware, async (req, res) => {
   }
 });
 
+// Google Authentication
+router.post('/google', async (req, res) => {
+  try {
+    const { email, name, firebaseUid } = req.body;
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Create new user if doesn't exist
+      user = new User({
+        name,
+        email,
+        firebaseUid,
+        isVerified: true, // Google users are automatically verified
+        password: undefined, // No password for Google users
+      });
+      await user.save();
+    } else {
+      // Update firebaseUid if user already exists but doesn't have it
+      if (!user.firebaseUid) {
+        user.firebaseUid = firebaseUid;
+        await user.save();
+      }
+    }
+
+    // Generate JWT token
+    const token = generateToken(user._id);
+
+    res.json({
+      message: 'Google login successful',
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;

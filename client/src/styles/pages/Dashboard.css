@@ -3,7 +3,7 @@
 .dashboard {
   min-height: 100vh;
   padding: 2rem 0;
-  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  background: transparent;
 }
 
 .dashboard-header {
@@ -23,6 +23,30 @@
 .dashboard-header p {
   font-size: 1.125rem;
   color: var(--text-secondary);
+}
+
+/* Map Section */
+.dashboard-map-section {
+  max-width: 1200px;
+  margin: 0 auto 2.5rem;
+  padding: 0 1.5rem;
+}
+
+.dashboard-map-section h2 {
+  font-size: 1.25rem;
+  margin: 0 0 0.75rem 0;
+  color: var(--text-primary);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.dashboard-map-section .live-map-container {
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.55);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
 }
 
 .stats-overview {
@@ -215,9 +239,11 @@
 }
 
 .action-btn.secondary {
-  background: white;
+  background: rgba(255, 255, 255, 0.65);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .action-btn.secondary:hover {
@@ -242,6 +268,144 @@
   margin-bottom: 1rem;
 }
 
+/* Safe Havens Section */
+.safe-havens-section {
+  max-width: 1200px;
+  margin: 2.5rem auto;
+  padding: 0 1.5rem;
+}
+
+.safe-havens-header {
+  margin-bottom: 1.5rem;
+}
+
+.safe-havens-header h2 {
+  font-size: 1.5rem;
+  margin: 0 0 0.25rem 0;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.safe-havens-header p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.safe-havens-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.safe-haven-card {
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  border: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+.haven-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+}
+
+.haven-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.haven-icon {
+  font-size: 2rem;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.haven-info h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.haven-type {
+  display: inline-block;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary);
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 0.25rem;
+}
+
+.haven-details {
+  flex: 1;
+}
+
+.haven-address {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.75rem 0;
+  line-height: 1.4;
+}
+
+.haven-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding-bottom: 0.5rem;
+}
+
+.distance {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.rating {
+  color: #f59e0b;
+  font-weight: 600;
+}
+
+.directions-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.directions-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.directions-btn:active {
+  transform: translateY(0);
+}
+
 @media (max-width: 1024px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
@@ -249,6 +413,10 @@
 
   .stats-overview {
     grid-template-columns: 1fr;
+  }
+
+  .safe-havens-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
 }
 
@@ -265,6 +433,15 @@
     font-size: 1rem;
   }
 
+  .dashboard-map-section {
+    margin-bottom: 2rem;
+    padding: 0 1rem;
+  }
+
+  .dashboard-map-section h2 {
+    font-size: 1.1rem;
+  }
+
   .stats-overview {
     margin-bottom: 2rem;
     gap: 1rem;
@@ -279,4 +456,77 @@
   .quick-actions {
     grid-template-columns: 1fr;
   }
+
+  .safe-havens-section {
+    margin: 2rem auto;
+    padding: 0 1rem;
+  }
+
+  .safe-havens-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .safe-havens-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .safe-haven-card {
+    min-height: 180px;
+  }
+
+  .haven-info h4 {
+    font-size: 1rem;
+  }
+
+  .directions-btn {
+    font-size: 0.9rem;
+    padding: 0.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .safe-havens-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .safe-havens-section {
+    padding: 0 0.75rem;
+  }
+
+  .safe-havens-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .haven-info h4 {
+    font-size: 0.95rem;
+  }
+
+  .haven-address {
+    font-size: 0.85rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DARK MODE overrides — Dashboard
+   ═══════════════════════════════════════════════════════════ */
+[data-theme="dark"] .dashboard-map-section .live-map-container {
+  background: rgba(18, 20, 40, 0.70);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .action-btn.secondary {
+  background: rgba(20, 22, 44, 0.72);
+  border-color: rgba(255, 255, 255, 0.10);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .action-btn.secondary:hover {
+  background: rgba(28, 30, 56, 0.88);
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .safe-haven-card {
+  background: rgba(18, 20, 40, 0.75);
+  border-color: rgba(99, 102, 241, 0.15);
 }

@@ -349,3 +349,32 @@
     padding: 1rem;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   DARK MODE overrides — RecordScore
+   ═══════════════════════════════════════════════════════════ */
+[data-theme="dark"] .record-page {
+  background: transparent;
+}
+
+/* Slider thumb — remove white border, use dark ring */
+[data-theme="dark"] .slider::-webkit-slider-thumb {
+  border-color: rgba(255,255,255,0.15);
+}
+
+[data-theme="dark"] .slider::-moz-range-thumb {
+  border-color: rgba(255,255,255,0.15);
+}
+
+[data-theme="dark"] .textarea {
+  background: rgba(16, 18, 36, 0.70);
+  border-color: rgba(255,255,255,0.10);
+  color: #f1f5f9;
+}
+
+[data-theme="dark"] .textarea:focus {
+  background: rgba(20, 22, 44, 0.85);
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .textarea::placeholder { color: #64748b; }

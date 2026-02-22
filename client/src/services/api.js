@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -13,9 +12,12 @@ export const apiClient = axios.create({
 // Add token to requests
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Only inject user token if the request hasn't set its own Authorization header
+    if (!config.headers.Authorization) {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -38,6 +40,7 @@ apiClient.interceptors.response.use(
 export const authAPI = {
   signup: (data) => apiClient.post('/auth/signup', data),
   login: (data) => apiClient.post('/auth/login', data),
+  googleAuth: (data) => apiClient.post('/auth/google', data),
   verify: () => apiClient.get('/auth/verify'),
 };
 
@@ -45,6 +48,10 @@ export const authAPI = {
 export const userAPI = {
   getProfile: () => apiClient.get('/users/profile'),
   updateProfile: (data) => apiClient.put('/users/profile', data),
+  getSettings: () => apiClient.get('/users/settings'),
+  updateSettings: (data) => apiClient.put('/users/settings', data),
+  changePassword: (data) => apiClient.post('/users/change-password', data),
+  deleteAccount: () => apiClient.delete('/users/account'),
   addCaregiver: (data) => apiClient.post('/users/caregivers', data),
   getCaregivers: () => apiClient.get('/users/caregivers'),
   deleteCaregiver: (id) => apiClient.delete(`/users/caregivers/${id}`),
@@ -106,22 +113,42 @@ export const safeHavenAPI = {
 // Community Report API calls
 export const communityReportAPI = {
   create: (data) => apiClient.post('/community-reports', data),
-  getReports: (reportType, status, limit = 20, skip = 0) => {
+  getReports: (params = {}) => {
+    const { reportType, status, district, latitude, longitude, radius, limit = 20, skip = 0 } = params;
     let url = `/community-reports?limit=${limit}&skip=${skip}`;
     if (reportType) url += `&reportType=${reportType}`;
-    if (status) url += `&status=${status}`;
+    if (status)     url += `&status=${status}`;
+    if (district)   url += `&district=${encodeURIComponent(district)}`;
+    if (latitude)   url += `&latitude=${latitude}&longitude=${longitude}`;
+    if (radius)     url += `&radius=${radius}`;
     return apiClient.get(url);
   },
   getNearby: (longitude, latitude, distance = 5000) =>
-    apiClient.get(
-      `/community-reports/nearby?longitude=${longitude}&latitude=${latitude}&distance=${distance}`
-    ),
+    apiClient.get(`/community-reports/nearby?longitude=${longitude}&latitude=${latitude}&distance=${distance}`),
   getTrending: (limit = 10) =>
     apiClient.get(`/community-reports/trending?limit=${limit}`),
   getById: (id) => apiClient.get(`/community-reports/${id}`),
   vote: (id, data) => apiClient.post(`/community-reports/${id}/vote`, data),
-  addComment: (id, data) =>
-    apiClient.post(`/community-reports/${id}/comment`, data),
+  addComment: (id, data) => apiClient.post(`/community-reports/${id}/comment`, data),
+  flag: (id) => apiClient.post(`/community-reports/${id}/flag`),
+  moderate: (id, data) => apiClient.post(`/community-reports/${id}/moderate`, data),
+};
+
+// Disaster Mode API
+export const disasterAPI = {
+  activate:       (data)  => apiClient.post('/disaster/activate', data),
+  updateLocation: (data)  => apiClient.patch('/disaster/location', data),
+  deactivate:     ()      => apiClient.delete('/disaster/deactivate'),
+  getSession:     ()      => apiClient.get('/disaster/session'),
+  getBroadcasts:  ()      => apiClient.get('/disaster/broadcasts'),
+  track:          (id)    => apiClient.get(`/disaster/track/${id}`),
+  helpdesk: {
+    login:     (creds)        => apiClient.post('/disaster/helpdesk/login', creds),
+    sessions:  (token, region) => apiClient.get(`/disaster/helpdesk/sessions${region ? `?region=${encodeURIComponent(region)}` : ''}`, { headers: { Authorization: `Bearer ${token}` } }),
+    regions:   (token)        => apiClient.get('/disaster/helpdesk/regions',   { headers: { Authorization: `Bearer ${token}` } }),
+    broadcasts:(token)        => apiClient.get('/disaster/helpdesk/broadcasts', { headers: { Authorization: `Bearer ${token}` } }),
+    broadcast: (token, data)  => apiClient.post('/disaster/helpdesk/broadcast', data, { headers: { Authorization: `Bearer ${token}` } }),
+  },
 };
 
 // Music Therapy API calls

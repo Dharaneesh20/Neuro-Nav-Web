@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { FiMail, FiLock, FiUser, FiEye, FiEyeOff, FiArrowRight, FiCheck } from 'react-icons/fi';
+import { FiMail, FiLock, FiUser, FiEye, FiEyeOff, FiArrowRight } from 'react-icons/fi';
 import { FaGoogle, FaApple } from 'react-icons/fa';
 import Card from '../components/Card';
 import { Link, useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
+import { useAuthContext } from '../context/AuthContext';
 import '../styles/pages/Auth.css';
 
 const SignupPage = () => {
   const navigate = useNavigate();
+  const { login } = useAuthContext();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -50,8 +52,9 @@ const SignupPage = () => {
       };
 
       const response = await authAPI.signup(signupData);
-      localStorage.setItem('authToken', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      // Use the context login function to update global auth state
+      login(response.data.token, response.data.user);
+      // Navigate to dashboard after successful signup
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'Signup failed');

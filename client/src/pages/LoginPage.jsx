@@ -5,10 +5,12 @@ import { FaGoogle, FaApple } from 'react-icons/fa';
 import Card from '../components/Card';
 import { Link, useNavigate } from 'react-router-dom';
 import { authAPI } from '../services/api';
+import { useAuthContext } from '../context/AuthContext';
 import '../styles/pages/Auth.css';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { login, loginWithGoogle } = useAuthContext();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -16,6 +18,7 @@ const LoginPage = () => {
     rememberMe: false,
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleChange = (e) => {
@@ -35,13 +38,28 @@ const LoginPage = () => {
         email: formData.email,
         password: formData.password,
       });
-      localStorage.setItem('authToken', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      // Use the context login function to update global auth state
+      login(response.data.token, response.data.user);
+      // Navigate to dashboard after successful login
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async (e) => {
+    e.preventDefault();
+    setError('');
+    setIsGoogleLoading(true);
+    try {
+      await loginWithGoogle();
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.message || 'Google login failed');
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
@@ -188,9 +206,14 @@ const LoginPage = () => {
 
               {/* Social Login */}
               <motion.div className="social-login" variants={itemVariants}>
-                <button type="button" className="social-btn google">
+                <button 
+                  type="button" 
+                  className="social-btn google"
+                  onClick={handleGoogleLogin}
+                  disabled={isGoogleLoading}
+                >
                   <FaGoogle size={20} />
-                  <span>Google</span>
+                  <span>{isGoogleLoading ? 'Signing in...' : 'Google'}</span>
                 </button>
                 <button type="button" className="social-btn apple">
                   <FaApple size={20} />

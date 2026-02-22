@@ -2,7 +2,10 @@
 
 .auth-page {
   min-height: 100vh;
-  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(139,92,246,0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 10%, rgba(99,102,241,0.14) 0%, transparent 55%),
+    linear-gradient(160deg, #f0f4ff 0%, #f8f0ff 40%, #f0f8ff 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,6 +74,7 @@
 
 .benefit {
   background: rgba(255, 255, 255, 0.8);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: var(--radius-lg);
@@ -273,27 +277,44 @@
 }
 
 .social-btn {
-  padding: 0.75rem;
-  border: 1px solid var(--border-color);
-  background: white;
+  padding: 0.875rem 1rem;
+  border: 1px solid rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.62);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
   border-radius: var(--radius-lg);
   color: var(--text-primary);
   font-weight: 600;
   cursor: pointer;
   transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.social-btn svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .social-btn:hover {
   border-color: var(--primary);
-  background: var(--bg-secondary);
+  background: rgba(99, 102, 241, 0.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .social-btn.google:hover {
   color: #4285f4;
+  border-color: #4285f4;
 }
 
 .social-btn.apple:hover {
   color: #000;
+  border-color: #000;
 }
 
 .form-footer {
@@ -397,4 +418,40 @@
   .blob-2 {
     opacity: 0.1;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DARK MODE overrides — Auth pages (Auth.css)
+   ═══════════════════════════════════════════════════════════ */
+[data-theme="dark"] .auth-page {
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 0%,  rgba(99,102,241,0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 10%,  rgba(139,92,246,0.18) 0%, transparent 55%),
+    linear-gradient(160deg, #0c0d1b 0%, #10101e 40%, #0a0b17 100%);
+}
+
+[data-theme="dark"] .benefit {
+  background: rgba(20, 22, 44, 0.75);
+  border-color: rgba(255,255,255,0.09);
+}
+
+[data-theme="dark"] .benefit:hover {
+  background: rgba(26, 28, 56, 0.90);
+  box-shadow: var(--shadow-lg);
+}
+
+[data-theme="dark"] .social-btn {
+  background: rgba(20, 22, 44, 0.75);
+  border-color: rgba(255,255,255,0.10);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .social-btn:hover {
+  background: rgba(28, 30, 58, 0.90);
+  border-color: var(--primary);
+}
+
+[data-theme="dark"] .social-btn.apple:hover {
+  color: #f1f5f9;
+  border-color: rgba(255,255,255,0.35);
 }

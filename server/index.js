@@ -14,6 +14,8 @@ const musicTherapyRoutes = require('./routes/musicTherapy');
 const historyRoutes = require('./routes/history');
 const exportRoutes = require('./routes/export');
 const healthRoutes = require('./routes/health');
+const chatRoutes = require('./routes/chat');
+const disasterRoutes = require('./routes/disaster');
 const { securityMiddleware, apiLimiter } = require('./middleware/security');
 
 const app = express();
@@ -45,6 +47,8 @@ app.use('/api/community-reports', communityReportRoutes);
 app.use('/api/music-therapy', musicTherapyRoutes);
 app.use('/api/history', historyRoutes);
 app.use('/api/export', exportRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/disaster', disasterRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

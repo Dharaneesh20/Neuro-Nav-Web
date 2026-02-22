@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './styles/modern-theme.css';
+
+// Context
+import { AuthProvider, useAuthContext } from './context/AuthContext';
 
 // Components
 import Navigation from './components/Navigation';
@@ -15,6 +18,12 @@ import RecordScore from './pages/RecordScore';
 import MapView from './pages/MapView';
 import Settings from './pages/Settings';
 import Analytics from './pages/Analytics';
+import CommunityFeed from './pages/CommunityFeed';
+import DisasterMode from './pages/DisasterMode';
+import HelpDesk from './pages/HelpDesk';
+import DisasterTrack from './pages/DisasterTrack';
+import PlanTrip from './pages/PlanTrip';
+import ChatBot from './pages/ChatBot';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 
@@ -26,16 +35,8 @@ const ProtectedRoute = ({ children, isAuthenticated }) => {
   return children;
 };
 
-const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Check if user is already logged in
-    const token = localStorage.getItem('authToken');
-    setIsAuthenticated(!!token);
-    setIsLoading(false);
-  }, []);
+const AppContent = () => {
+  const { isAuthenticated, isLoading } = useAuthContext();
 
   if (isLoading) {
     return <div className="app-loading">Loading...</div>;
@@ -107,16 +108,60 @@ const App = () => {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/plan-trip"
+              element={
+                <ProtectedRoute isAuthenticated={isAuthenticated}>
+                  <PlanTrip />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/chat"
+              element={
+                <ProtectedRoute isAuthenticated={isAuthenticated}>
+                  <ChatBot />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/community"
+              element={
+                <ProtectedRoute isAuthenticated={isAuthenticated}>
+                  <CommunityFeed />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/disaster"
+              element={
+                <ProtectedRoute isAuthenticated={isAuthenticated}>
+                  <DisasterMode />
+                </ProtectedRoute>
+              }
+            />
+            {/* Public disaster tracking — no auth required */}
+            <Route path="/disaster/track/:sessionId" element={<DisasterTrack />} />
+            {/* Helpdesk portal — has its own login */}
+            <Route path="/helpdesk" element={<HelpDesk />} />
 
             {/* Catch all - redirect to home */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
 
-        {!isAuthenticated && <Footer />}
+        <Footer />
         {isAuthenticated && <PanicButton />}
       </div>
     </Router>
+  );
+};
+
+const App = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 };
 

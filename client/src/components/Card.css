@@ -1,16 +1,20 @@
-/* Modern Card Styles */
+/* Modern Card Styles — Apple Glass */
 
 .modern-card {
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.65);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: var(--radius-xl);
   padding: 1.5rem;
   transition: all var(--transition-base);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 24px rgba(99,102,241,0.09), 0 1px 4px rgba(0,0,0,0.04);
 }
 
 .modern-card:hover {
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 8px 40px rgba(99,102,241,0.16), 0 2px 8px rgba(0,0,0,0.06);
+  transform: translateY(-2px);
+  border-color: rgba(99,102,241,0.3);
 }
 
 .modern-card.gradient {
@@ -20,4 +24,17 @@
 
 .modern-card.gradient:hover {
   border-color: rgba(99, 102, 241, 0.3);
+}
+
+/* ── Dark mode ── */
+[data-theme="dark"] .modern-card {
+  background: rgba(20, 22, 42, 0.80);
+  border-color: rgba(255, 255, 255, 0.09);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.40), 0 1px 4px rgba(0,0,0,0.25);
+}
+
+[data-theme="dark"] .modern-card:hover {
+  background: rgba(26, 28, 54, 0.90);
+  border-color: rgba(99,102,241,0.35);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.50), 0 2px 8px rgba(0,0,0,0.30);
 }

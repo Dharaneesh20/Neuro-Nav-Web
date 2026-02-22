@@ -1,8 +1,20 @@
 node_modules/
+
+# Environment files — never commit these
 .env
 .env.local
+.env.development
+.env.development.local
+.env.test.local
+.env.production
+.env.production.local
+server/.env
+client/.env
+client/.env.local
+
 dist/
 build/
+client/build/
 *.log
 .DS_Store
 .vscode/

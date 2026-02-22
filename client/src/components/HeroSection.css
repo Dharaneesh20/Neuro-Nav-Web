@@ -177,3 +177,8 @@
     height: 200px;
   }
 }
+
+/* ── Dark mode ── */
+[data-theme="dark"] .hero {
+  background: transparent;
+}
