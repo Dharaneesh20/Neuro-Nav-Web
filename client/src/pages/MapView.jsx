@@ -53,6 +53,15 @@ const fetchAQIData = async (lat, lng) => {
   return data.status === 'ok' ? data.data : null;
 };
 
+// Fetch all stations inside a bounding box
+const fetchAQIBounds = async (lat1, lng1, lat2, lng2) => {
+  const res = await fetch(
+    `https://api.waqi.info/map/bounds/?token=${WAQI_TOKEN}&latlng=${lat1},${lng1},${lat2},${lng2}`
+  );
+  const data = await res.json();
+  return data.status === 'ok' ? data.data : [];
+};
+
 /* ── Nearby place categories (OpenStreetMap / Overpass) ──── */
 const PLACE_TYPES = [
   { osm: 'amenity=cafe',             label: 'Café',          icon: '☕', color: '#a16207', bg: '#fef3c7' },
@@ -124,8 +133,9 @@ const MapView = () => {
   const mapRef = useRef(null);
   const gmapRef = useRef(null);
   const infoWinRef = useRef(null);
-  const markersRef = useRef({});     // id → google.maps.Marker
-  const aqiLayerRef = useRef(null);  // WAQI tile overlay
+  const markersRef = useRef({});       // id → google.maps.Marker
+  const aqiCirclesRef = useRef([]);    // google.maps.Circle[] for AQI stations
+  const aqiInfoWinRef = useRef(null);  // InfoWindow for AQI station click
 
   const [location, setLocation] = useState(null);
   const [places, setPlaces] = useState([]);
@@ -172,22 +182,19 @@ const MapView = () => {
       gmapRef.current = map;
       infoWinRef.current = new window.google.maps.InfoWindow();
 
-      // ── WAQI AQI tile overlay ──────────────────────────────
-      const tileLayer = new window.google.maps.ImageMapType({
-        getTileUrl: (coord, zoom) =>
-          `https://tiles.waqi.info/tiles/usepa-aqi/${zoom}/${coord.x}/${coord.y}.png?token=${WAQI_TOKEN}`,
-        tileSize: new window.google.maps.Size(256, 256),
-        opacity: 0.65,
-        name: 'AQI',
-      });
-      map.overlayMapTypes.push(tileLayer);
-      aqiLayerRef.current = tileLayer;
+      aqiInfoWinRef.current = new window.google.maps.InfoWindow();
 
-      // Fetch nearest AQI station data
+      // Fetch nearest AQI station data (for sidebar panel)
       setAqiLoading(true);
       fetchAQIData(location.lat, location.lng)
         .then(d => { if (!cancelled) { setAqiData(d); setAqiLoading(false); } })
         .catch(() => { if (!cancelled) setAqiLoading(false); });
+
+      // Draw AQI station circles on first load
+      drawAQICircles(map);
+
+      // Re-draw when user pans/zooms
+      map.addListener('idle', () => drawAQICircles(map));
 
       // User marker
       new window.google.maps.Marker({
@@ -268,17 +275,75 @@ const MapView = () => {
     if (marker) openInfoWindow(map, marker, place);
   }, []); // eslint-disable-line
 
+  /* ── Draw AQI station circles on the map ─────────────────*/
+  const drawAQICircles = useCallback((map) => {
+    if (!map) return;
+    const bounds = map.getBounds();
+    if (!bounds) return;
+    const ne = bounds.getNorthEast();
+    const sw = bounds.getSouthWest();
+    // Expand bounds slightly for better coverage
+    const pad = 0.3;
+    fetchAQIBounds(
+      sw.lat() - pad, sw.lng() - pad,
+      ne.lat() + pad, ne.lng() + pad
+    ).then(stations => {
+      // Clear old circles
+      aqiCirclesRef.current.forEach(c => c.setMap(null));
+      aqiCirclesRef.current = [];
+      if (!showAqiLayerRef.current) return;
+      stations.forEach(st => {
+        const aqiVal = parseInt(st.aqi, 10);
+        if (isNaN(aqiVal) || aqiVal < 0) return;
+        const lvl = getAQILevel(aqiVal);
+        const circle = new window.google.maps.Circle({
+          center: { lat: parseFloat(st.lat), lng: parseFloat(st.lon) },
+          radius: 4500,
+          map,
+          fillColor: lvl.color,
+          fillOpacity: 0.30,
+          strokeColor: lvl.color,
+          strokeOpacity: 0.7,
+          strokeWeight: 1.5,
+          clickable: true,
+          zIndex: 1,
+        });
+        circle.addListener('click', () => {
+          aqiInfoWinRef.current.setContent(`
+            <div style="padding:6px 8px;font-family:sans-serif;min-width:160px">
+              <b style="font-size:13px">${st.station?.name || 'AQI Station'}</b>
+              <div style="margin:6px 0;display:flex;align-items:center;gap:8px">
+                <span style="font-size:1.6rem;font-weight:800;color:${lvl.color}">${aqiVal}</span>
+                <span style="font-size:0.85rem;color:${lvl.color};font-weight:600">${lvl.label} ${lvl.emoji}</span>
+              </div>
+              <p style="margin:0;font-size:11px;color:#666;line-height:1.4">${lvl.tip}</p>
+            </div>
+          `);
+          aqiInfoWinRef.current.setPosition({ lat: parseFloat(st.lat), lng: parseFloat(st.lon) });
+          aqiInfoWinRef.current.open(map);
+        });
+        aqiCirclesRef.current.push(circle);
+      });
+    }).catch(() => {});
+  }, []); // eslint-disable-line
+
+  // Keep a ref so the idle listener can check current toggle state
+  const showAqiLayerRef = useRef(true);
+
   /* ── Toggle AQI overlay ───────────────────────────────── */
   const toggleAqiLayer = useCallback(() => {
-    const map = gmapRef.current;
-    if (!map || !aqiLayerRef.current) return;
-    if (showAqiLayer) {
-      map.overlayMapTypes.clear();
+    const next = !showAqiLayerRef.current;
+    showAqiLayerRef.current = next;
+    setShowAqiLayer(next);
+    if (!next) {
+      // Hide all circles immediately
+      aqiCirclesRef.current.forEach(c => c.setMap(null));
+      aqiCirclesRef.current = [];
     } else {
-      map.overlayMapTypes.push(aqiLayerRef.current);
+      // Redraw
+      drawAQICircles(gmapRef.current);
     }
-    setShowAqiLayer(prev => !prev);
-  }, [showAqiLayer]);
+  }, [drawAQICircles]);
 
   /* ── Fetch trip history ───────────────────────────────── */
   useEffect(() => {
