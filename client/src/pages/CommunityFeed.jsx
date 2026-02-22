@@ -8,7 +8,7 @@ import 'leaflet/dist/leaflet.css';
 import {
   FiPlus, FiMapPin, FiArrowUp, FiArrowDown, FiMessageSquare,
   FiFlag, FiX, FiFilter, FiAlertTriangle, FiShield, FiNavigation,
-  FiChevronDown, FiImage, FiVideo, FiEyeOff, FiLoader,
+  FiImage, FiVideo, FiLoader,
   FiRefreshCw, FiAlertCircle, FiUser,
 } from 'react-icons/fi';
 import { communityReportAPI } from '../services/api';

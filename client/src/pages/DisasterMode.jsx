@@ -6,11 +6,9 @@ import {
 } from 'react-icons/fi';
 import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
 import { disasterAPI } from '../services/api';
-import { useAuthContext } from '../context/AuthContext';
 import '../styles/pages/DisasterMode.css';
 
 const DisasterMode = () => {
-  const { user } = useAuthContext();
   const { isLoaded: mapsLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY || '',
   });

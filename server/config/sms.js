@@ -4,12 +4,15 @@ const twilio = require('twilio');
 let client = null;
 
 try {
-  if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
-    client = twilio(
-      process.env.TWILIO_ACCOUNT_SID,
-      process.env.TWILIO_AUTH_TOKEN
-    );
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  
+  // Validate Twilio credentials format before initializing
+  if (accountSid && authToken && accountSid.startsWith('AC') && accountSid.length >= 32) {
+    client = twilio(accountSid, authToken);
     console.log('✅ Twilio SMS client initialized');
+  } else if (accountSid && !accountSid.startsWith('AC')) {
+    console.warn('⚠️  Invalid Twilio Account SID format - must start with "AC"');
   } else {
     console.warn('⚠️  Twilio credentials not found - SMS functionality disabled');
   }

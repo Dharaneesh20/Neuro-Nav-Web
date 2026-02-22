@@ -232,7 +232,7 @@ const PanicButton = ({ className }) => {
 
   /* ── Effect 2: Add haven marker + route when haven arrives ─ */
   useEffect(() => {
-    if (!haven || !gmapRef.current) return;
+    if (!haven || !gmapRef.current || !userLoc) return;
 
     const map = gmapRef.current;
     const hLatLng = new window.google.maps.LatLng(haven.lat, haven.lng);
@@ -274,7 +274,7 @@ const PanicButton = ({ className }) => {
         map.fitBounds(bounds);
       }
     });
-  }, [haven]);
+  }, [haven, userLoc]);
 
   /* ── Cleanup on unmount ──────────────────────────── */
   useEffect(() => () => clearTimeout(breathTimerRef.current), []);

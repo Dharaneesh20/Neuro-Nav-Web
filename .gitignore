@@ -28,3 +28,10 @@ mongodb/
 .next/
 out/
 coverage/
+
+# Deployment files
+deploy-package/
+*.tar.gz
+neuronav-deploy/
+neuro-nav-deploy/
+*.pem

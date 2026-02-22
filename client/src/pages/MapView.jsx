@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  FiMapPin, FiFilter, FiNavigation, FiClock, FiX,
+  FiMapPin, FiNavigation, FiClock, FiX,
   FiSearch, FiChevronRight, FiCalendar, FiTrendingUp,
   FiWind, FiEye, FiEyeOff, FiAlertTriangle,
 } from 'react-icons/fi';
@@ -44,18 +44,6 @@ const AQI_LEVELS = [
 
 const getAQILevel = (aqiVal) =>
   AQI_LEVELS.find(l => aqiVal <= l.max) || AQI_LEVELS[AQI_LEVELS.length - 1];
-
-// Returns a Google Maps icon object shaped like a classic teardrop pin
-const makePinIcon = (fill, stroke = '#fff', scale = 1) => ({
-  url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${28 * scale}" height="${36 * scale}" viewBox="0 0 28 36">`+
-    `<path d="M14 0C6.27 0 0 6.27 0 14c0 9.625 14 22 14 22S28 23.625 28 14C28 6.27 21.73 0 14 0z" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>`+
-    `<circle cx="14" cy="14" r="5.5" fill="${stroke}"/>`+
-    `</svg>`
-  )}`,
-  scaledSize: { width: 28 * scale, height: 36 * scale },
-  anchor: { x: 14 * scale, y: 36 * scale },
-});
 
 const fetchAQIData = async (lat, lng) => {
   const res = await fetch(

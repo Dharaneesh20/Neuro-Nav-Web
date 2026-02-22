@@ -9,7 +9,6 @@ import '../styles/pages/Dashboard.css';
 
 const Dashboard = () => {
   const { user } = useAuthContext();
-  const [isLoading, setIsLoading] = useState(false);
   const [safeHavens, setSafeHavens] = useState([]);
   const mapInstanceRef = useRef(null);   // google.maps.Map from LiveMap
   const mapSectionRef = useRef(null);    // scroll anchor
@@ -26,11 +25,10 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      setIsLoading(true);
       
-      // Fetch user profile
+      // Fetch user profile (commented out as not currently used)
       try {
-        const userRes = await userAPI.getProfile();
+        await userAPI.getProfile();
         //setUser(userRes.data);
       } catch (err) {
         console.error('Failed to fetch user profile:', err.message, err.response?.status);
