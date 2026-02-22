@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   FiMapPin, FiFilter, FiNavigation, FiClock, FiX,
   FiSearch, FiChevronRight, FiCalendar, FiTrendingUp,
+  FiWind, FiEye, FiEyeOff, FiAlertTriangle,
 } from 'react-icons/fi';
 import { routeAPI } from '../services/api';
 import '../styles/pages/MapView.css';
@@ -28,6 +29,29 @@ const loadGoogleMaps = (() => {
     return p;
   };
 })();
+
+/* ── AQI helpers ─────────────────────────────────────────── */
+const WAQI_TOKEN = process.env.REACT_APP_WAQI_TOKEN || 'demo';
+
+const AQI_LEVELS = [
+  { max: 50,  label: 'Good',              color: '#00c851', bg: '#e8fff0', emoji: '😊', tip: 'Air quality is great. Ideal for outdoor activities.' },
+  { max: 100, label: 'Moderate',          color: '#e6b800', bg: '#fffde7', emoji: '😐', tip: 'Acceptable. Unusually sensitive individuals may experience minor symptoms.' },
+  { max: 150, label: 'Unhealthy (S.G.)',  color: '#ff8800', bg: '#fff3e0', emoji: '😷', tip: 'Sensitive groups are at risk. Limit prolonged outdoor exertion.' },
+  { max: 200, label: 'Unhealthy',         color: '#f44336', bg: '#fde8e8', emoji: '🚫', tip: 'Everyone may begin to experience health effects. Reduce outdoor time.' },
+  { max: 300, label: 'Very Unhealthy',    color: '#9c27b0', bg: '#f3e8ff', emoji: '⚠️', tip: 'Health alert. Avoid this area if possible.' },
+  { max: 500, label: 'Hazardous',         color: '#7d0023', bg: '#ffe4e4', emoji: '☠️', tip: 'Emergency conditions. Do NOT go outside.' },
+];
+
+const getAQILevel = (aqiVal) =>
+  AQI_LEVELS.find(l => aqiVal <= l.max) || AQI_LEVELS[AQI_LEVELS.length - 1];
+
+const fetchAQIData = async (lat, lng) => {
+  const res = await fetch(
+    `https://api.waqi.info/feed/geo:${lat};${lng}/?token=${WAQI_TOKEN}`
+  );
+  const data = await res.json();
+  return data.status === 'ok' ? data.data : null;
+};
 
 /* ── Nearby place categories (OpenStreetMap / Overpass) ──── */
 const PLACE_TYPES = [
@@ -101,6 +125,7 @@ const MapView = () => {
   const gmapRef = useRef(null);
   const infoWinRef = useRef(null);
   const markersRef = useRef({});     // id → google.maps.Marker
+  const aqiLayerRef = useRef(null);  // WAQI tile overlay
 
   const [location, setLocation] = useState(null);
   const [places, setPlaces] = useState([]);
@@ -111,7 +136,12 @@ const MapView = () => {
   const [loadingPlaces, setLoadingPlaces] = useState(false);
   const [tripHistory, setTripHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
-  const [activeTab, setActiveTab] = useState('nearby'); // 'nearby' | 'history'
+  const [activeTab, setActiveTab] = useState('nearby'); // 'nearby' | 'history' | 'air'
+
+  // AQI state
+  const [aqiData, setAqiData] = useState(null);
+  const [aqiLoading, setAqiLoading] = useState(false);
+  const [showAqiLayer, setShowAqiLayer] = useState(true);
 
   /* ── Get user location ─────────────────────────────────── */
   useEffect(() => {
@@ -141,6 +171,23 @@ const MapView = () => {
       });
       gmapRef.current = map;
       infoWinRef.current = new window.google.maps.InfoWindow();
+
+      // ── WAQI AQI tile overlay ──────────────────────────────
+      const tileLayer = new window.google.maps.ImageMapType({
+        getTileUrl: (coord, zoom) =>
+          `https://tiles.waqi.info/tiles/usepa-aqi/${zoom}/${coord.x}/${coord.y}.png?token=${WAQI_TOKEN}`,
+        tileSize: new window.google.maps.Size(256, 256),
+        opacity: 0.65,
+        name: 'AQI',
+      });
+      map.overlayMapTypes.push(tileLayer);
+      aqiLayerRef.current = tileLayer;
+
+      // Fetch nearest AQI station data
+      setAqiLoading(true);
+      fetchAQIData(location.lat, location.lng)
+        .then(d => { if (!cancelled) { setAqiData(d); setAqiLoading(false); } })
+        .catch(() => { if (!cancelled) setAqiLoading(false); });
 
       // User marker
       new window.google.maps.Marker({
@@ -221,6 +268,18 @@ const MapView = () => {
     if (marker) openInfoWindow(map, marker, place);
   }, []); // eslint-disable-line
 
+  /* ── Toggle AQI overlay ───────────────────────────────── */
+  const toggleAqiLayer = useCallback(() => {
+    const map = gmapRef.current;
+    if (!map || !aqiLayerRef.current) return;
+    if (showAqiLayer) {
+      map.overlayMapTypes.clear();
+    } else {
+      map.overlayMapTypes.push(aqiLayerRef.current);
+    }
+    setShowAqiLayer(prev => !prev);
+  }, [showAqiLayer]);
+
   /* ── Fetch trip history ───────────────────────────────── */
   useEffect(() => {
     routeAPI.getRoutes(20, 0).then(res => {
@@ -269,6 +328,30 @@ const MapView = () => {
               <p>Loading map…</p>
             </div>
           )}
+
+          {/* AQI layer toggle button */}
+          {!loadingMap && (
+            <button
+              className={`mv-aqi-toggle ${showAqiLayer ? 'active' : ''}`}
+              onClick={toggleAqiLayer}
+              title={showAqiLayer ? 'Hide AQI layer' : 'Show AQI layer'}
+            >
+              {showAqiLayer ? <FiEye size={14} /> : <FiEyeOff size={14} />}
+              <span>AQI Layer</span>
+            </button>
+          )}
+
+          {/* Compact AQI badge on map */}
+          {!loadingMap && aqiData && (() => {
+            const lvl = getAQILevel(aqiData.aqi);
+            return (
+              <div className="mv-aqi-badge" style={{ background: lvl.bg, borderColor: lvl.color }}>
+                <span className="mv-aqi-badge-num" style={{ color: lvl.color }}>{aqiData.aqi}</span>
+                <span className="mv-aqi-badge-label" style={{ color: lvl.color }}>AQI</span>
+                <span className="mv-aqi-badge-emoji">{lvl.emoji}</span>
+              </div>
+            );
+          })()}
         </div>
 
         {/* Sidebar */}
@@ -283,10 +366,27 @@ const MapView = () => {
               {places.length > 0 && <span className="mv-tab-badge">{filteredPlaces.length}</span>}
             </button>
             <button
+              className={`mv-tab ${activeTab === 'air' ? 'active' : ''}`}
+              onClick={() => setActiveTab('air')}
+            >
+              <FiWind size={15} /> Air Quality
+              {aqiData && (() => {
+                const lvl = getAQILevel(aqiData.aqi);
+                return (
+                  <span
+                    className="mv-tab-badge"
+                    style={{ background: lvl.color, color: '#fff' }}
+                  >
+                    {aqiData.aqi}
+                  </span>
+                );
+              })()}
+            </button>
+            <button
               className={`mv-tab ${activeTab === 'history' ? 'active' : ''}`}
               onClick={() => setActiveTab('history')}
             >
-              <FiClock size={15} /> Trip History
+              <FiClock size={15} /> History
               {tripHistory.length > 0 && <span className="mv-tab-badge">{tripHistory.length}</span>}
             </button>
           </div>
@@ -365,6 +465,136 @@ const MapView = () => {
                 )}
               </div>
             </>
+          )}
+
+          {/* ── Air Quality tab ────────── */}
+          {activeTab === 'air' && (
+            <div className="mv-aqi-panel">
+              {aqiLoading ? (
+                <div className="mv-loading-msg">
+                  <div className="mv-spinner" /> Fetching air quality data…
+                </div>
+              ) : !aqiData ? (
+                <div className="mv-empty">
+                  <FiWind size={32} opacity={0.3} />
+                  <p>No AQI data available for this location.</p>
+                </div>
+              ) : (() => {
+                const lvl = getAQILevel(aqiData.aqi);
+                const iaqi = aqiData.iaqi || {};
+                const pm25  = iaqi.pm25?.v;
+                const pm10  = iaqi.pm10?.v;
+                const o3    = iaqi.o3?.v;
+                const no2   = iaqi.no2?.v;
+                const co    = iaqi.co?.v;
+                const so2   = iaqi.so2?.v;
+                const isUnhealthy = aqiData.aqi > 100;
+                const isDangerous = aqiData.aqi > 150;
+                return (
+                  <>
+                    {/* Main AQI card */}
+                    <div className="mv-aqi-main" style={{ background: lvl.bg, borderColor: lvl.color }}>
+                      <div className="mv-aqi-circle" style={{ borderColor: lvl.color }}>
+                        <span className="mv-aqi-number" style={{ color: lvl.color }}>{aqiData.aqi}</span>
+                        <span className="mv-aqi-unit">AQI</span>
+                      </div>
+                      <div className="mv-aqi-info">
+                        <div className="mv-aqi-emoji">{lvl.emoji}</div>
+                        <div className="mv-aqi-level" style={{ color: lvl.color }}>{lvl.label}</div>
+                        <div className="mv-aqi-station">
+                          <FiMapPin size={11} /> {aqiData.city?.name || 'Nearest station'}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Avoidance warning */}
+                    {isDangerous && (
+                      <div className="mv-aqi-warning danger">
+                        <FiAlertTriangle size={18} />
+                        <div>
+                          <strong>Avoid this area</strong>
+                          <p>{lvl.tip}</p>
+                        </div>
+                      </div>
+                    )}
+                    {isUnhealthy && !isDangerous && (
+                      <div className="mv-aqi-warning moderate">
+                        <FiAlertTriangle size={18} />
+                        <div>
+                          <strong>Caution advised</strong>
+                          <p>{lvl.tip}</p>
+                        </div>
+                      </div>
+                    )}
+                    {!isUnhealthy && (
+                      <div className="mv-aqi-warning good">
+                        <span style={{ fontSize: '18px' }}>✓</span>
+                        <div>
+                          <strong>Safe to be outdoors</strong>
+                          <p>{lvl.tip}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Pollutant breakdown */}
+                    <div className="mv-aqi-section-title">Pollutant Levels</div>
+                    <div className="mv-aqi-pollutants">
+                      {[
+                        { key: 'PM2.5', val: pm25, unit: 'μg/m³', desc: 'Fine particles', icon: '🌫️', danger: 35 },
+                        { key: 'PM10',  val: pm10, unit: 'μg/m³', desc: 'Coarse particles', icon: '💨', danger: 150 },
+                        { key: 'O₃',    val: o3,   unit: 'ppb',   desc: 'Ozone (oxygen)', icon: '🌀', danger: 70 },
+                        { key: 'NO₂',   val: no2,  unit: 'ppb',   desc: 'Nitrogen dioxide', icon: '🏭', danger: 100 },
+                        { key: 'SO₂',   val: so2,  unit: 'ppb',   desc: 'Sulfur dioxide', icon: '⚗️', danger: 75 },
+                        { key: 'CO',    val: co,   unit: 'ppm',   desc: 'Carbon monoxide', icon: '🚗', danger: 9 },
+                      ].filter(p => p.val !== undefined).map(p => {
+                        const pct = Math.min(100, (p.val / (p.danger * 2)) * 100);
+                        const barColor = p.val > p.danger ? '#f44336' : p.val > p.danger * 0.5 ? '#ff8800' : '#00c851';
+                        return (
+                          <div key={p.key} className="mv-aqi-pollutant">
+                            <div className="mv-aqi-poll-header">
+                              <span className="mv-aqi-poll-icon">{p.icon}</span>
+                              <span className="mv-aqi-poll-key">{p.key}</span>
+                              <span className="mv-aqi-poll-val" style={{ color: barColor }}>
+                                {typeof p.val === 'number' ? p.val.toFixed(1) : p.val} {p.unit}
+                              </span>
+                            </div>
+                            <div className="mv-aqi-bar-bg">
+                              <div
+                                className="mv-aqi-bar-fill"
+                                style={{ width: `${pct}%`, background: barColor }}
+                              />
+                            </div>
+                            <div className="mv-aqi-poll-desc">{p.desc}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* AQI legend */}
+                    <div className="mv-aqi-section-title">AQI Scale</div>
+                    <div className="mv-aqi-legend">
+                      {AQI_LEVELS.map(l => (
+                        <div
+                          key={l.label}
+                          className={`mv-aqi-legend-item ${aqiData.aqi <= l.max && (AQI_LEVELS.find(x => aqiData.aqi <= x.max) === l) ? 'current' : ''}`}
+                          style={{ borderColor: l.color, background: l.bg }}
+                        >
+                          <span className="mv-aqi-legend-dot" style={{ background: l.color }} />
+                          <span className="mv-aqi-legend-label">{l.label}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Last updated */}
+                    {aqiData.time?.s && (
+                      <div className="mv-aqi-updated">
+                        <FiClock size={11} /> Updated: {aqiData.time.s}
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
           )}
 
           {/* ── History tab ────────────── */}
