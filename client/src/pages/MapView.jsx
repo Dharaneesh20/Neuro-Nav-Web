@@ -45,6 +45,18 @@ const AQI_LEVELS = [
 const getAQILevel = (aqiVal) =>
   AQI_LEVELS.find(l => aqiVal <= l.max) || AQI_LEVELS[AQI_LEVELS.length - 1];
 
+// Returns a Google Maps icon object shaped like a classic teardrop pin
+const makePinIcon = (fill, stroke = '#fff', scale = 1) => ({
+  url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${28 * scale}" height="${36 * scale}" viewBox="0 0 28 36">`+
+    `<path d="M14 0C6.27 0 0 6.27 0 14c0 9.625 14 22 14 22S28 23.625 28 14C28 6.27 21.73 0 14 0z" fill="${fill}" stroke="${stroke}" stroke-width="1.5"/>`+
+    `<circle cx="14" cy="14" r="5.5" fill="${stroke}"/>`+
+    `</svg>`
+  )}`,
+  scaledSize: { width: 28 * scale, height: 36 * scale },
+  anchor: { x: 14 * scale, y: 36 * scale },
+});
+
 const fetchAQIData = async (lat, lng) => {
   const res = await fetch(
     `https://api.waqi.info/feed/geo:${lat};${lng}/?token=${WAQI_TOKEN}`
@@ -196,16 +208,21 @@ const MapView = () => {
       // Re-draw when user pans/zooms
       map.addListener('idle', () => drawAQICircles(map));
 
-      // User marker
+      // User location pin
       new window.google.maps.Marker({
         position: location, map,
         title: 'You are here',
-        zIndex: 999,
+        zIndex: 1000,
         icon: {
-          path: window.google.maps.SymbolPath.CIRCLE,
-          scale: 11,
-          fillColor: '#6366f1', fillOpacity: 1,
-          strokeColor: '#fff', strokeWeight: 3,
+          url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
+            '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="46" viewBox="0 0 36 46">'+
+            '<path d="M18 0C8.06 0 0 8.06 0 18c0 12.42 18 28 18 28S36 30.42 36 18C36 8.06 27.94 0 18 0z" fill="#6366f1" stroke="#fff" stroke-width="2"/>'+
+            '<circle cx="18" cy="18" r="7" fill="white"/>'+
+            '<circle cx="18" cy="18" r="3.5" fill="#6366f1"/>'+
+            '</svg>'
+          )}`,
+          scaledSize: new window.google.maps.Size(36, 46),
+          anchor: new window.google.maps.Point(18, 46),
         },
       });
 
@@ -235,10 +252,14 @@ const MapView = () => {
       title: place.name,
       label: { text: place.icon, fontSize: '16px' },
       icon: {
-        path: window.google.maps.SymbolPath.CIRCLE,
-        scale: 15,
-        fillColor: place.bg, fillOpacity: 0.9,
-        strokeColor: place.color, strokeWeight: 2,
+        url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
+          `<svg xmlns="http://www.w3.org/2000/svg" width="30" height="38" viewBox="0 0 30 38">`+
+          `<path d="M15 0C6.72 0 0 6.72 0 15c0 10.17 15 23 15 23S30 25.17 30 15C30 6.72 23.28 0 15 0z" fill="${place.bg}" stroke="${place.color}" stroke-width="2"/>`+
+          `<text x="15" y="20" text-anchor="middle" font-size="13" font-family="sans-serif">${place.icon}</text>`+
+          `</svg>`
+        )}`,
+        scaledSize: new window.google.maps.Size(30, 38),
+        anchor: new window.google.maps.Point(15, 38),
       },
     });
     marker.addListener('click', () => {

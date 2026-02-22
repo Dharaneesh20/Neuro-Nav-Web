@@ -356,21 +356,32 @@ const PlanTrip = () => {
       map,
     });
 
-    // Start marker (green)
+    const makeSvgPin = (fill, label) => ({
+      url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
+        `<svg xmlns="http://www.w3.org/2000/svg" width="36" height="46" viewBox="0 0 36 46">`+
+        `<path d="M18 0C8.06 0 0 8.06 0 18c0 12.42 18 28 18 28S36 30.42 36 18C36 8.06 27.94 0 18 0z" fill="${fill}" stroke="white" stroke-width="2"/>`+
+        `<text x="18" y="24" text-anchor="middle" font-size="14" font-weight="bold" fill="white" font-family="sans-serif">${label}</text>`+
+        `</svg>`
+      )}`,
+      scaledSize: new window.google.maps.Size(36, 46),
+      anchor: new window.google.maps.Point(18, 46),
+    });
+
+    // Start marker (green pin with A)
     const startMarker = new window.google.maps.Marker({
       position: { lat: startLat, lng: startLng },
       map,
       title: 'Start',
-      icon: { path: window.google.maps.SymbolPath.CIRCLE, scale: 9,
-        fillColor: '#22c55e', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 2 },
+      zIndex: 100,
+      icon: makeSvgPin('#22c55e', 'A'),
     });
-    // End marker (red)
+    // End marker (red pin with B)
     const endMarker = new window.google.maps.Marker({
       position: { lat: endLat, lng: endLng },
       map,
       title: 'Destination',
-      icon: { path: window.google.maps.SymbolPath.CIRCLE, scale: 9,
-        fillColor: '#ef4444', fillOpacity: 1, strokeColor: '#fff', strokeWeight: 2 },
+      zIndex: 100,
+      icon: makeSvgPin('#ef4444', 'B'),
     });
     gmMarkersRef.current.push(startMarker, endMarker);
 
@@ -393,14 +404,16 @@ const PlanTrip = () => {
         position: { lat: poi.lat, lng: poi.lng },
         map,
         title: poi.name,
-        label: { text: poi.icon, fontSize: '18px' },
+        zIndex: 50,
         icon: {
-          path: window.google.maps.SymbolPath.CIRCLE,
-          scale: 14,
-          fillColor: poi.color,
-          fillOpacity: 0.15,
-          strokeColor: poi.color,
-          strokeWeight: 1.5,
+          url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
+            `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40">`+
+            `<path d="M16 0C7.16 0 0 7.16 0 16c0 11.03 16 24 16 24S32 27.03 32 16C32 7.16 24.84 0 16 0z" fill="${poi.color}" fill-opacity="0.9" stroke="white" stroke-width="1.5"/>`+
+            `<text x="16" y="21" text-anchor="middle" font-size="13" font-family="sans-serif">${poi.icon}</text>`+
+            `</svg>`
+          )}`,
+          scaledSize: new window.google.maps.Size(32, 40),
+          anchor: new window.google.maps.Point(16, 40),
         },
       });
       marker.addListener('click', () => {
