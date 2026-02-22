@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
-import { GoogleMap, OverlayView, useJsApiLoader } from '@react-google-maps/api';
+import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
 import { FiMapPin, FiRefreshCw, FiAlertTriangle, FiActivity } from 'react-icons/fi';
 import { disasterAPI } from '../services/api';
+import '../styles/pages/DisasterTrack.css';
 
 const DisasterTrack = () => {
   const { sessionId } = useParams();
@@ -168,40 +169,30 @@ const DisasterTrack = () => {
           </div>
 
           {/* Map */}
-          {data.latitude && (
+          {data.latitude && typeof data.latitude === 'number' && typeof data.longitude === 'number' && (
             <div style={{ height: 380, borderRadius: 18, overflow: 'hidden', border: '1px solid rgba(239,68,68,0.25)' }}>
               {mapsLoaded ? (
                 <GoogleMap
                   mapContainerStyle={{ height: '100%', width: '100%' }}
-                  center={{ lat: data.latitude, lng: data.longitude }}
+                  center={{ lat: parseFloat(data.latitude), lng: parseFloat(data.longitude) }}
                   zoom={15}
                   options={{ streetViewControl: false, mapTypeControl: false }}
                 >
-                  <OverlayView
+                  <Marker
                     position={{ lat: parseFloat(data.latitude), lng: parseFloat(data.longitude) }}
-                    mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-                  >
-                    <div style={{ transform: 'translate(-50%, -100%)', position: 'relative' }}>
-                      <div style={{
-                        width: 32, height: 32, borderRadius: '50% 50% 50% 0',
-                        background: '#ef4444', border: '3px solid #fff',
-                        boxShadow: '0 2px 10px rgba(0,0,0,0.5)',
-                        transform: 'rotate(-45deg)',
-                        animation: 'pinPulse 1.5s ease-in-out infinite',
-                      }} />
-                      <div style={{
-                        position: 'absolute', top: 6, left: 6,
-                        width: 20, height: 20, borderRadius: '50%',
-                        background: '#fff', transform: 'rotate(45deg)',
-                      }} />
-                      <div style={{
-                        position: 'absolute', top: 9, left: 9,
-                        width: 14, height: 14, borderRadius: '50%',
-                        background: '#ef4444', transform: 'rotate(45deg)',
-                      }} />
-                    </div>
-                  </OverlayView>
-                  <style>{`@keyframes pinPulse { 0%,100%{box-shadow:0 2px 10px rgba(239,68,68,0.5)} 50%{box-shadow:0 2px 24px rgba(239,68,68,0.9)} }`}</style>
+                    title="Disaster Location"
+                    icon={{
+                      url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
+                        `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40">
+                          <path d="M16 0C7.16 0 0 7.16 0 16c0 10 16 24 16 24s16-14 16-24c0-8.84-7.16-16-16-16z" fill="#ef4444" stroke="#fff" stroke-width="2"/>
+                          <circle cx="16" cy="16" r="6" fill="#fff"/>
+                          <circle cx="16" cy="16" r="3" fill="#ef4444"/>
+                        </svg>`
+                      )}`,
+                      scaledSize: new window.google.maps.Size(32, 40),
+                      anchor: new window.google.maps.Point(16, 40),
+                    }}
+                  />
                 </GoogleMap>
               ) : (
                 <div style={{ display:'flex',alignItems:'center',justifyContent:'center',height:380,background:'#1e1b4b',color:'#888' }}>Loading map…</div>
@@ -212,7 +203,7 @@ const DisasterTrack = () => {
           {/* Google Maps link */}
           {data.latitude && (
             <a
-              href={`https://www.google.com/maps?q=${data.latitude},${data.longitude}`}
+              href={`https://www.google.com/maps?q=${parseFloat(data.latitude)},${parseFloat(data.longitude)}`}
               target="_blank"
               rel="noreferrer"
               style={{

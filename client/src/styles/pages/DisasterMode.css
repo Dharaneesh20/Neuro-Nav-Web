@@ -34,6 +34,16 @@
   50%       { box-shadow: 0 0 0 12px rgba(239,68,68,0); }
 }
 
+/* Pin pulse animation for map markers */
+@keyframes dmPinPulse {
+  0%, 100% {
+    box-shadow: 0 2px 10px rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    box-shadow: 0 2px 20px rgba(239, 68, 68, 0.8);
+  }
+}
+
 .dm-header h1 { font-size: 1.7rem; font-weight: 800; margin: 0 0 0.2rem; }
 .dm-header p  { font-size: 0.9rem; margin: 0; opacity: 0.60; }
 

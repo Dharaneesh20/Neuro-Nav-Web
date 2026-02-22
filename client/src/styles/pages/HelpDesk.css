@@ -315,3 +315,13 @@
 /* Spin */
 .spin { animation: hdSpin 0.8s linear infinite; }
 @keyframes hdSpin { to { transform: rotate(360deg); } }
+
+/* Pin pulse animation for map markers */
+@keyframes pinPulse {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  }
+  50% {
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.65);
+  }
+}

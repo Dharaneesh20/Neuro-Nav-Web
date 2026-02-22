@@ -303,11 +303,11 @@ const HelpDeskDashboard = ({ token, onLogout }) => {
                       <OverlayView
                         key={s._id}
                         position={{ lat: parseFloat(s.latitude), lng: parseFloat(s.longitude) }}
-                        mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
+                        mapPaneName={OverlayView.OVERLAY_LAYER}
                       >
                         <div
                           onClick={() => setActiveMarker(activeMarker === s._id ? null : s._id)}
-                          style={{ position: 'relative', cursor: 'pointer', transform: 'translate(-50%, -100%)' }}
+                          style={{ position: 'relative', cursor: 'pointer', transform: 'translate(-50%, -100%)', zIndex: 10 }}
                         >
                           {/* Pin body */}
                           <div style={{
@@ -315,6 +315,7 @@ const HelpDeskDashboard = ({ token, onLogout }) => {
                             background: '#ef4444', border: '3px solid #fff',
                             boxShadow: '0 2px 8px rgba(0,0,0,0.45)',
                             transform: 'rotate(-45deg)',
+                            animation: 'pinPulse 1.5s ease-in-out infinite',
                           }} />
                           {/* Initial inside pin */}
                           <div style={{

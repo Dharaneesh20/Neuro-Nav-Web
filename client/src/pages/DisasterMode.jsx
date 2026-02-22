@@ -4,7 +4,7 @@ import {
   FiAlertTriangle, FiMapPin, FiShare2, FiXCircle,
   FiRadio, FiCheckCircle, FiRefreshCw, FiCopy,
 } from 'react-icons/fi';
-import { GoogleMap, OverlayView, useJsApiLoader } from '@react-google-maps/api';
+import { GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
 import { disasterAPI } from '../services/api';
 import { useAuthContext } from '../context/AuthContext';
 import '../styles/pages/DisasterMode.css';
@@ -86,18 +86,35 @@ const DisasterMode = () => {
 
     watchRef.current = navigator.geolocation.watchPosition(
       async (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        setCoords({ lat, lng });
-        const { addr, rgn } = await reverseGeocode(lat, lng);
-        doPing(lat, lng, addr, rgn || region);
+        try {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          
+          // Ensure valid coordinates
+          if (typeof lat !== 'number' || typeof lng !== 'number' || isNaN(lat) || isNaN(lng)) {
+            console.warn('Invalid coordinates received from geolocation');
+            return;
+          }
+          
+          setCoords({ lat: parseFloat(lat), lng: parseFloat(lng) });
+          const { addr, rgn } = await reverseGeocode(lat, lng);
+          doPing(lat, lng, addr, rgn || region);
+        } catch (err) {
+          console.error('Error in watch position:', err);
+        }
       },
-      (err) => setGeoError(err.message),
+      (err) => {
+        const errorMsg = err.code === 1 ? 'Location permission denied' : 
+                         err.code === 2 ? 'Location unavailable' :
+                         err.code === 3 ? 'Location request timeout' :
+                         'Unknown location error';
+        setGeoError(errorMsg);
+      },
       { enableHighAccuracy: true, maximumAge: 10000 }
     );
 
     pingRef.current = setInterval(() => {
-      if (coords) {
+      if (coords && typeof coords.lat === 'number' && typeof coords.lng === 'number') {
         doPing(coords.lat, coords.lng, address, region);
       }
     }, 20000);
@@ -112,31 +129,52 @@ const DisasterMode = () => {
   const handleActivate = async () => {
     setActivating(true);
     setError(null);
+    setGeoError(null);
+    
+    if (!navigator.geolocation) {
+      setError('Geolocation not supported on this device');
+      setActivating(false);
+      return;
+    }
+
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
-        setCoords({ lat, lng });
-        const { addr, rgn } = await reverseGeocode(lat, lng);
         try {
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          
+          // Ensure coords are valid numbers
+          if (typeof lat !== 'number' || typeof lng !== 'number' || isNaN(lat) || isNaN(lng)) {
+            throw new Error('Invalid location coordinates');
+          }
+          
+          setCoords({ lat: parseFloat(lat), lng: parseFloat(lng) });
+          const { addr, rgn } = await reverseGeocode(lat, lng);
+          
           const { data } = await disasterAPI.activate({
-            latitude: lat, longitude: lng,
-            address: addr, region: rgn,
+            latitude: lat, 
+            longitude: lng,
+            address: addr, 
+            region: rgn,
           });
+          
           setSessionId(data.sessionId);
           setIsActive(true);
         } catch (e) {
-          setError(e?.response?.data?.error || 'Failed to activate');
-        } finally {
+          setError(e?.response?.data?.error || e.message || 'Failed to activate');
           setActivating(false);
         }
       },
       (e) => {
-        setGeoError(e.message);
+        const errorMsg = e.code === 1 ? 'Location permission denied' : 
+                         e.code === 2 ? 'Location unavailable' :
+                         e.code === 3 ? 'Location request timeout' :
+                         'Unknown location error';
+        setGeoError(errorMsg);
+        setError(`Location access denied: ${errorMsg}. Please enable location permissions.`);
         setActivating(false);
-        setError('Location access denied. Please allow location access.');
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
   };
 
@@ -283,7 +321,7 @@ const DisasterMode = () => {
 
           {/* Map */}
           <AnimatePresence>
-            {isActive && coords && (
+            {isActive && coords && (typeof coords.lat === 'number' && typeof coords.lng === 'number') && (
               <motion.div
                 className="dm-card dm-map-card"
                 initial={{ opacity: 0, y: 20 }}
@@ -295,30 +333,25 @@ const DisasterMode = () => {
                   {mapsLoaded ? (
                     <GoogleMap
                       mapContainerStyle={{ height: '100%', width: '100%' }}
-                      center={{ lat: coords.lat, lng: coords.lng }}
+                      center={{ lat: parseFloat(coords.lat), lng: parseFloat(coords.lng) }}
                       zoom={15}
                       options={{ streetViewControl: false, mapTypeControl: false }}
                     >
-                      <OverlayView
+                      <Marker
                         position={{ lat: parseFloat(coords.lat), lng: parseFloat(coords.lng) }}
-                        mapPaneName={OverlayView.OVERLAY_MOUSE_TARGET}
-                      >
-                        <div style={{ transform: 'translate(-50%, -100%)', position: 'relative' }}>
-                          <div style={{
-                            width: 32, height: 32, borderRadius: '50% 50% 50% 0',
-                            background: '#ef4444', border: '3px solid #fff',
-                            boxShadow: '0 2px 10px rgba(0,0,0,0.4)',
-                            transform: 'rotate(-45deg)',
-                            animation: 'dmPinPulse 1.5s ease-in-out infinite',
-                          }} />
-                          <div style={{
-                            position: 'absolute', top: 6, left: 6,
-                            width: 20, height: 20, borderRadius: '50%',
-                            background: '#fff', transform: 'rotate(45deg)',
-                          }} />
-                          <style>{`@keyframes dmPinPulse { 0%,100%{box-shadow:0 2px 10px rgba(239,68,68,0.4)} 50%{box-shadow:0 2px 20px rgba(239,68,68,0.8)} }`}</style>
-                        </div>
-                      </OverlayView>
+                        title="Your Location"
+                        icon={{
+                          url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(
+                            `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40">
+                              <path d="M16 0C7.16 0 0 7.16 0 16c0 10 16 24 16 24s16-14 16-24c0-8.84-7.16-16-16-16z" fill="#ef4444" stroke="#fff" stroke-width="2"/>
+                              <circle cx="16" cy="16" r="6" fill="#fff"/>
+                              <circle cx="16" cy="16" r="3" fill="#ef4444"/>
+                            </svg>`
+                          )}`,
+                          scaledSize: new window.google.maps.Size(32, 40),
+                          anchor: new window.google.maps.Point(16, 40),
+                        }}
+                      />
                     </GoogleMap>
                   ) : (
                     <div style={{ display:'flex',alignItems:'center',justifyContent:'center',height:'100%',color:'#888' }}>Loading map…</div>

@@ -1,0 +1,36 @@
+/* ══ Disaster Track Page ══════════════════════════════════ */
+
+/* Pin pulse animation */
+@keyframes pinPulse {
+  0%, 100% {
+    box-shadow: 0 2px 10px rgba(239, 68, 68, 0.5);
+  }
+  50% {
+    box-shadow: 0 2px 24px rgba(239, 68, 68, 0.9);
+  }
+}
+
+.pin-marker {
+  animation: pinPulse 1.5s ease-in-out infinite;
+}
+
+/* Global animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin {
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}

@@ -999,3 +999,111 @@
 [data-theme="dark"] .mv-aqi-warning.danger   { background: rgba(244,67,54,0.12); }
 [data-theme="dark"] .mv-aqi-warning.moderate { background: rgba(255,136,0,0.10); }
 [data-theme="dark"] .mv-aqi-warning.good     { background: rgba(0,200,81,0.10); }
+/* Directions Panel */
+.mv-directions-panel {
+  position: fixed;
+  right: 20px;
+  top: 120px;
+  width: 340px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.mv-directions-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.mv-directions-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1f2937;
+}
+
+.mv-directions-header button {
+  font-size: 24px;
+  color: #9ca3af;
+  transition: color 0.2s;
+}
+
+.mv-directions-header button:hover {
+  color: #6366f1;
+}
+
+.mv-directions-content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mv-route-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mv-route-point {
+  display: flex;
+  gap: 12px;
+}
+
+.mv-route-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.mv-route-label {
+  margin: 0;
+  font-weight: 600;
+  font-size: 13px;
+  color: #1f2937;
+}
+
+.mv-route-addr {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.mv-route-line {
+  width: 2px;
+  height: 24px;
+  background: linear-gradient(to bottom, #6366f1, #10b981);
+  margin-left: 5px;
+}
+
+.mv-route-tip {
+  background: #f3f4f6;
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 3px solid #6366f1;
+}
+
+@media (max-width: 1024px) {
+  .mv-directions-panel {
+    position: fixed;
+    right: 10px;
+    left: 10px;
+    top: auto;
+    bottom: 20px;
+    width: auto;
+    max-height: 300px;
+  }
+}

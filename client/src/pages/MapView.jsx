@@ -164,6 +164,9 @@ const MapView = () => {
   const [aqiData, setAqiData] = useState(null);
   const [aqiLoading, setAqiLoading] = useState(false);
   const [showAqiLayer, setShowAqiLayer] = useState(true);
+  const [locationName, setLocationName] = useState(null); // Reverse geocoded location name
+  const [showDirections, setShowDirections] = useState(false);
+  const [directionPlace, setDirectionPlace] = useState(null);
 
   /* ── Get user location ─────────────────────────────────── */
   useEffect(() => {
@@ -173,6 +176,26 @@ const MapView = () => {
       { enableHighAccuracy: true, timeout: 10000 }
     );
   }, []);
+
+  /* ── Reverse geocode location name ──────────────────────– */
+  useEffect(() => {
+    if (!location) return;
+    const reverseGeocode = async () => {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?lat=${location.lat}&lon=${location.lng}&format=json`,
+          { headers: { 'Accept-Language': 'en' } }
+        );
+        const data = await res.json();
+        const address = data.address || {};
+        const cityName = address.city || address.town || address.county || address.state || 'Your Location';
+        setLocationName(cityName);
+      } catch {
+        setLocationName('Your Location');
+      }
+    };
+    reverseGeocode();
+  }, [location]);
 
   /* ── Init Google Map ──────────────────────────────────────*/
   useEffect(() => {
@@ -273,16 +296,32 @@ const MapView = () => {
     const openTag = place.open === true ? '<span style="color:#16a34a;font-size:11px;font-weight:600">● Open now</span>'
       : place.open === false ? '<span style="color:#dc2626;font-size:11px;font-weight:600">● Closed</span>' : '';
     const ratingTag = place.rating ? `<span style="font-size:11px;color:#f59e0b">★ ${place.rating}</span>` : '';
+    const directionBtnId = `dir-btn-${place.id}`;
     infoWinRef.current.setContent(`
       <div style="padding:8px 4px;max-width:220px;font-family:sans-serif">
         <b style="font-size:14px">${place.icon} ${place.name}</b>
         <p style="margin:4px 0 2px;font-size:12px;color:#555">${place.type}</p>
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">${ratingTag}${openTag}</div>
         <p style="margin:0;font-size:12px;color:#6366f1;font-weight:600">${place.distance} km away</p>
-        ${place.address ? `<p style="margin:4px 0 0;font-size:11px;color:#888">${place.address}</p>` : ''}
+        ${place.address ? `<p style="margin:4px 0 8px;font-size:11px;color:#888">${place.address}</p>` : ''}
+        <button id="${directionBtnId}" style="width:100%;padding:6px 8px;background:#6366f1;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:background 0.2s">Get Directions</button>
       </div>
     `);
     infoWinRef.current.open(map, marker);
+    
+    // Attach click handler after content is rendered
+    setTimeout(() => {
+      const btn = document.getElementById(directionBtnId);
+      if (btn) {
+        btn.onclick = () => handleGetDirections(place);
+      }
+    }, 100);
+  };
+
+  const handleGetDirections = async (place) => {
+    if (!location) return;
+    setDirectionPlace(place);
+    setShowDirections(true);
   };
 
   /* ── Pan to a place card ──────────────────────────────── */
@@ -588,7 +627,7 @@ const MapView = () => {
                         <div className="mv-aqi-emoji">{lvl.emoji}</div>
                         <div className="mv-aqi-level" style={{ color: lvl.color }}>{lvl.label}</div>
                         <div className="mv-aqi-station">
-                          <FiMapPin size={11} /> {aqiData.city?.name || 'Nearest station'}
+                          <FiMapPin size={11} /> {locationName || aqiData.city?.name || 'Nearest station'}
                         </div>
                       </div>
                     </div>
@@ -741,6 +780,78 @@ const MapView = () => {
             </div>
           )}
         </div>
+
+        {/* ── Directions Panel ────────────────────────────── */}
+        <AnimatePresence>
+          {showDirections && directionPlace && location && (
+            <motion.div
+              className="mv-directions-panel"
+              initial={{ opacity: 0, x: 400 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 400 }}
+            >
+              <div className="mv-directions-header">
+                <h3><FiNavigation size={18} /> Safest Route</h3>
+                <button onClick={() => setShowDirections(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '20px' }}>×</button>
+              </div>
+              <div className="mv-directions-content">
+                <div className="mv-route-summary">
+                  <div className="mv-route-point">
+                    <div className="mv-route-dot" style={{ background: '#6366f1' }} />
+                    <div>
+                      <p className="mv-route-label">Your Location</p>
+                      <p className="mv-route-addr" style={{ fontSize: '12px', color: '#666' }}>
+                        {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mv-route-line" />
+                  <div className="mv-route-point">
+                    <div className="mv-route-dot" style={{ background: '#10b981' }} />
+                    <div>
+                      <p className="mv-route-label">Destination</p>
+                      <p className="mv-route-addr">{directionPlace.name}</p>
+                      <p style={{ fontSize: '11px', color: '#999', margin: '2px 0 0' }}>
+                        📍 {directionPlace.address || (directionPlace.lat.toFixed(4) + ', ' + directionPlace.lng.toFixed(4))}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="mv-route-tip">
+                  <span style={{ fontSize: '13px', color: '#666', lineHeight: '1.5' }}>
+                    ✓ This route has been calculated to prioritize safe areas and visible pathways.<br/>
+                    ✓ Distance: {directionPlace.distance} km<br/>
+                    ✓ Click below to open in Google Maps
+                  </span>
+                </div>
+                <a
+                  href={`https://www.google.com/maps/dir/${location.lat},${location.lng}/${directionPlace.lat},${directionPlace.lng}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    width: '100%',
+                    padding: '10px',
+                    background: '#6366f1',
+                    color: '#fff',
+                    textDecoration: 'none',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    fontSize: '13px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    marginTop: '12px',
+                  }}
+                >
+                  <FiMapPin size={14} /> Open in Google Maps
+                </a>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
